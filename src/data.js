@@ -39,6 +39,21 @@ export const products = [
     gallery: FLAVORS.map(f => f.img),
     hasFlavors: true,
   },
+  {
+    id:'bikini-care-package',
+    name:'FEMININITY CARE PACKAGE',
+    arName:'بكج الأنوثة للعناية بالمناطق الحساسة',
+    price:'AED 149',
+    aed:'DHS. 149.00',
+    priceAed:149,
+    img:'/images/lamssa/products/bikini-care/01.png',
+    hover:'/images/lamssa/products/bikini-care/01.png',
+    colorName:'Pink',
+    desc:'Complete bikini area care set — Beauty Girl wash & toner + soap. Brightening, moisturizing, 48h freshness.',
+    arDesc:'بكج كامل للعناية بالمناطق الحساسة — غسول وتونر + صابونة. تفتيح وترطيب وانتعاش ٤٨ ساعة.',
+    gallery: ['/images/lamssa/products/bikini-care/01.png'],
+    hasFlavors: false,
+  },
 ]
 
 export const blackProductGallery = products[0].gallery

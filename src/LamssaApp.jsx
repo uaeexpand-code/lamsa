@@ -541,10 +541,10 @@ function ProductPage(){
             </div>
 
             <div className="space-y-6">
-              <div>
+              {product.hasFlavors && <div>
                 <span className={optionLabel}>{isAr?'النكهة':'Flavor'}: <b className="text-[#181818]">{isAr ? selectedFlavor.arName : selectedFlavor.name}</b></span>
                 <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>{setSelectedFlavor(flavor); const idx = FLAVORS.findIndex(f=>f.id===flavor.id); goToImage(flavor.img, idx)}} aria-label={isAr?flavor.arName:flavor.name} className={`h-11 w-11 rounded-full border-2 transition ${selectedFlavor.id===flavor.id?'border-[#181818] ring-2 ring-[#181818] ring-offset-2':'border-[#e8e6e1] hover:border-[#999]'}`} style={{backgroundColor:flavor.hex}} />)}</div>
-              </div>
+              </div>}
               <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
             </div>
 
