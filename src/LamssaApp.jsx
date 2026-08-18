@@ -549,16 +549,18 @@ function ProductPage(){
               <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
             </div>
 
-            <div className="mt-7 grid gap-3 md:grid-cols-[124px_1fr]"><div className="flex h-[52px] overflow-hidden rounded-full border border-[#dedbd5]"><button onClick={()=>setQty(Math.max(1,qty-1))} className="flex-1"><Minus size={15} className="mx-auto"/></button><span className="grid flex-1 place-items-center text-sm">{qty}</span><button onClick={()=>setQty(qty+1)} className="flex-1"><Plus size={15} className="mx-auto"/></button></div><button onClick={addLine} className="h-[52px] rounded-full bg-[#171717] px-6 text-[13px] font-semibold uppercase tracking-[.14em] text-white">{t('addToCart')} · {fmt(linePrice * qty)}</button></div>
+            <div className="mt-6 rounded-[16px] bg-gradient-to-r from-[#fff0f3] to-[#fdf7f8] border border-[#f0d4dc] p-3.5 flex items-center gap-3">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#d4567a]/10"><Truck size={16} className="text-[#d4567a]"/></div>
+              <p className="text-[12.5px] leading-5 text-[#3d2b30]">{isAr?<>اطلب خلال <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return 'الآن'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h} ساعة و ${m} دقيقة`; })()}</b> لتوصيل بكرة</>:<>Order within <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return 'now'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h}h ${m}m`; })()}</b> to receive tomorrow</>}</p>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-[124px_1fr]"><div className="flex h-[52px] overflow-hidden rounded-full border border-[#dedbd5]"><button onClick={()=>setQty(Math.max(1,qty-1))} className="flex-1"><Minus size={15} className="mx-auto"/></button><span className="grid flex-1 place-items-center text-sm">{qty}</span><button onClick={()=>setQty(qty+1)} className="flex-1"><Plus size={15} className="mx-auto"/></button></div><button onClick={addLine} className="h-[52px] rounded-full bg-[#171717] px-6 text-[13px] font-semibold uppercase tracking-[.14em] text-white">{t('addToCart')} · {fmt(linePrice * qty)}</button></div>
             <Link to="/checkout" onClick={addLine} className="mt-3 flex h-[52px] items-center justify-center rounded-full border border-[#1a1a1a] bg-white text-[13px] font-semibold uppercase tracking-[.14em]">{t('buyNow')}</Link>
           </div>
         </aside>
       </div>
     </section>
     <section className="container-basic pb-5 md:pb-8">
-      <div className="mt-5 grid gap-3 md:grid-cols-1">
-        <div className="rounded-[22px] border border-[#dedbd5] bg-white/80 p-4 flex items-center gap-3"><Truck size={18} className="text-[#55514d] shrink-0"/><p className="text-[13px] leading-6 text-[#181818]">{isAr?<>اطلب خلال <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return isAr?'الآن':'now'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h} ساعة و ${m} دقيقة`; })()}</b> لتوصيل بكرة</>:<>Order within <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return 'now'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h}h ${m}m`; })()}</b> to receive tomorrow</>}</p></div>
-      </div>
       <Accordions product={product}/>
     </section>
     <ProductGrid title={t('relatedProducts')} list={products.filter(p => p.id !== product.id).slice(0,4)} />
