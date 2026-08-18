@@ -4,14 +4,14 @@
 :root {
   font-family: Montserrat, sans-serif;
   color: #181818;
-  background: #fdf7f8;
+  background: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   --brand: #d4567a;
   --brand-deep: #b8435f;
   --brand-soft: #f8e8ec;
-  --surface: #fdf7f8;
+  --surface: #ffffff;
   --surface-raised: #ffffff;
   --line: #f0d4dc;
   --muted: #8c6b74;
