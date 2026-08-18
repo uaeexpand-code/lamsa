@@ -4,17 +4,17 @@
 :root {
   font-family: Montserrat, sans-serif;
   color: #181818;
-  background: #f7f6f2;
+  background: #fdf7f8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --brand: #111111;
-  --brand-deep: #171717;
-  --brand-soft: #e8e6e1;
-  --surface: #f7f6f2;
+  --brand: #d4567a;
+  --brand-deep: #b8435f;
+  --brand-soft: #f8e8ec;
+  --surface: #fdf7f8;
   --surface-raised: #ffffff;
-  --line: #dedbd5;
-  --muted: #706c67;
+  --line: #f0d4dc;
+  --muted: #8c6b74;
 }
 
 [dir="rtl"] { text-align:start; }
