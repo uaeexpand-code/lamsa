@@ -556,8 +556,8 @@ function ProductPage(){
       </div>
     </section>
     <section className="container-basic pb-5 md:pb-8">
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
-        {[[isAr?'أبوظبي':'Abu Dhabi', isAr?'متجر إلكتروني مرخص في الإمارات':'Licensed UAE online store'],[isAr?'مرخص':'Licensed', isAr?'مرخص من دائرة التنمية الاقتصادية':'Licensed by the Department of Economic Development'],[isAr?'تواصل مباشر':'Direct support', isAr?'تأكيد عبر واتساب':'WhatsApp confirmation']].map(([title,body])=><div key={title} className="rounded-[22px] border border-[#dedbd5] bg-white/80 p-4"><BadgeCheck size={18} className="mb-3 text-[#55514d]"/><p className="text-[11px] font-semibold uppercase tracking-[.16em]">{title}</p><p className="mt-2 text-xs leading-5 text-[#706c67]">{body}</p></div>)}
+      <div className="mt-5 grid gap-3 md:grid-cols-1">
+        <div className="rounded-[22px] border border-[#dedbd5] bg-white/80 p-4 flex items-center gap-3"><Truck size={18} className="text-[#55514d] shrink-0"/><p className="text-[13px] leading-6 text-[#181818]">{isAr?<>اطلب خلال <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return isAr?'الآن':'now'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h} ساعة و ${m} دقيقة`; })()}</b> لتوصيل بكرة</>:<>Order within <b className="text-[#d4567a]">{(() => { const now = new Date(); const cutoff = new Date(); cutoff.setHours(21,0,0,0); const diff = cutoff - now; if(diff <= 0) return 'now'; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); return `${h}h ${m}m`; })()}</b> to receive tomorrow</>}</p></div>
       </div>
       <Accordions product={product}/>
     </section>
