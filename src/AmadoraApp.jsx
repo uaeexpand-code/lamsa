@@ -1,0 +1,644 @@
+import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { BadgeCheck, Banknote, CheckCircle2, CreditCard, Heart, Minus, Plus, Search, Share2, ShoppingBag, Trash2, Truck, User, X } from 'lucide-react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { assets, blackProductGallery, collections, products } from './data'
+
+const CartContext = createContext(null)
+const LanguageContext = createContext(null)
+const FREE_DELIVERY_AT = 1000
+const UAE_DELIVERY_FEE = 0
+const INSTAGRAM_URL = 'https://www.instagram.com/amadora.boutique19/'
+const WHATSAPP_URL = 'https://wa.me/971562905069'
+
+function CartProvider({ children }) {
+  const [cart, setCart] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('amadora-cart') || '[]') } catch { return [] }
+  })
+  const [cartOpen, setCartOpen] = useState(false)
+
+  useEffect(() => localStorage.setItem('amadora-cart', JSON.stringify(cart)), [cart])
+
+  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
+  const subtotal = cart.reduce((sum, item) => sum + item.priceAed * item.qty, 0)
+  const shipping = subtotal === 0 || subtotal >= FREE_DELIVERY_AT ? 0 : UAE_DELIVERY_FEE
+  const total = subtotal + shipping
+
+  function addToCart(line) {
+    const item = {
+      id: line.id,
+      name: line.name,
+      image: line.image || line.img,
+      priceAed: line.priceAed || 350,
+      length: line.length || '54',
+      size: line.size || 'Free Size',
+      buttons: line.buttons || 'No',
+      color: line.color || line.colorName || 'Black',
+      urgent: Boolean(line.urgent),
+      qty: line.qty || 1,
+    }
+    item.key = [item.id, item.color, item.length, item.size, item.buttons, item.urgent ? 'urgent' : 'standard'].join('|')
+    setCart(prev => {
+      const found = prev.find(x => x.key === item.key)
+      if (found) return prev.map(x => x.key === item.key ? { ...x, qty: x.qty + item.qty } : x)
+      return [...prev, item]
+    })
+    setCartOpen(true)
+  }
+
+  function updateQty(key, qty) {
+    setCart(prev => prev.map(x => x.key === key ? { ...x, qty: Math.max(1, qty) } : x))
+  }
+  function removeItem(key) { setCart(prev => prev.filter(x => x.key !== key)) }
+  function clearCart() { setCart([]) }
+
+  return <CartContext.Provider value={{ cart, cartCount, subtotal, shipping, total, cartOpen, setCartOpen, addToCart, updateQty, removeItem, clearCart }}>{children}</CartContext.Provider>
+}
+function useCart(){ return useContext(CartContext) }
+
+const copy = {
+  en: {
+    promo:'AMADORA · THE MEANING OF FEMININITY · ABU DHABI', shop:'Shop', new:'New', collections:'Collections', lace:'Lace', contact:'Contact', search:'Search', account:'Account', cart:'Open cart', language:'Arabic', footerLang:'English', addToCart:'Add to cart', salePrice:'Sale price', viewAll:'View all', checkout:'Checkout', continueShopping:'Continue shopping', home:'Home', abayas:'Pieces', shopNow:'Shop now', openCollection:'Open collection', pieces:'Pieces', price:'Price', color:'Color', length:'Length', buttons:'Buttons', size:'Size', sizeChart:'Size chart', no:'No', yes:'Yes', freeSize:'Free Size', custom:'Custom', buyNow:'Buy now', relatedProducts:'Related Products', inStock:'Available', premiumAbaya:'Amadora Boutique', uaecustomers:'Based in Abu Dhabi', taxDelivery:'Price shown in AED', paymentLine:'Pay by card, Tabby, Tamara or COD in UAE.', freeDeliveryOver:'Delivery details', intlShipping:'Contact us for delivery details'
+  },
+  ar: {
+    promo:'أمادورا · معنى الأنوثة · أبوظبي', shop:'تسوق', new:'جديد', collections:'المجموعات', lace:'دانتيل', contact:'تواصل', search:'بحث', account:'الحساب', cart:'افتح السلة', language:'الإنجليزية', footerLang:'العربية', addToCart:'أضف للسلة', salePrice:'السعر', viewAll:'عرض الكل', checkout:'إتمام الطلب', continueShopping:'متابعة التسوق', home:'الرئيسية', abayas:'القطع', shopNow:'تسوق الآن', openCollection:'افتح المجموعة', pieces:'قطع', price:'السعر', color:'اللون', length:'الطول', buttons:'الأزرار', size:'المقاس', sizeChart:'دليل المقاسات', no:'لا', yes:'نعم', freeSize:'مقاس حر', custom:'تفصيل خاص', buyNow:'اشترِ الآن', relatedProducts:'منتجات مشابهة', inStock:'متوفر', premiumAbaya:'أمادورا بوتيك', uaecustomers:'مقرها أبوظبي', taxDelivery:'السعر بالدرهم الإماراتي', paymentLine:'ادفعي بالبطاقة أو تابي أو تمارا أو الدفع عند الاستلام داخل الإمارات.', freeDeliveryOver:'تفاصيل التوصيل', intlShipping:'تواصلي معنا لتفاصيل التوصيل'
+  }
+}
+const arCollections = {
+  'NEW ARRIVALS':'وصل حديثاً',
+  'AMADORA BOUTIQUE NEW ARRIVALS':'وصل حديثاً من أمادورا بوتيك', 'SUMMER IDYLLS':'سمر إيدلز', 'CLASSY':'كلاسي', 'EVENING EDIT':'تشكيلة السهرة',
+  'AMADORA BOUTIQUE New Arrivals':'وصل حديثاً من أمادورا بوتيك', 'Amadora new arrivals':'وصل حديثاً من أمادورا', 'Summer Idylls':'سمر إيدلز', 'Classy':'كلاسي', 'Evening Edit':'تشكيلة السهرة', 'Related Products':'منتجات مشابهة'
+}
+const productName = (p, lang='en') => lang === 'ar' ? (p.arName || 'قطعة أمادورا') : p.name
+const productDesc = (p, lang='en') => lang === 'ar' ? (p.arDesc || p.desc) : p.desc
+const collectionText = (text, lang='en') => lang === 'ar' ? (arCollections[text] || text) : text
+function LanguageProvider({ children }){
+  const [lang,setLang] = useState(() => {
+    try { return localStorage.getItem('amadora-lang') || 'en' } catch { return 'en' }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('amadora-lang', lang) } catch { /* Storage can be blocked in private mode. */ }
+    document.documentElement.lang = lang === 'ar' ? 'ar' : 'en'
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+    document.title = lang === 'ar' ? 'أمادورا بوتيك | أبوظبي' : 'Amadora Boutique | Abu Dhabi'
+  }, [lang])
+  const value = useMemo(() => ({ lang, isAr: lang === 'ar', t:(key)=>copy[lang]?.[key] || copy.en[key] || key, toggleLang:()=>setLang(x=>x==='ar'?'en':'ar') }), [lang])
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+}
+function useLang(){ return useContext(LanguageContext) }
+
+const currencies = [
+  { code:'AED', symbol:'Dhs.', arSymbol:'د.إ', rate:1, label:'AED - UAE Dirham', arLabel:'الدرهم الإماراتي' },
+  { code:'USD', symbol:'$', arSymbol:'د.أ', rate:0.272, label:'USD - US Dollar', arLabel:'الدولار الأمريكي' },
+  { code:'EUR', symbol:'€', arSymbol:'يورو', rate:0.251, label:'EUR - Euro', arLabel:'اليورو' },
+  { code:'SAR', symbol:'SAR', arSymbol:'ر.س', rate:1.022, label:'SAR - Saudi Riyal', arLabel:'الريال السعودي' },
+  { code:'KWD', symbol:'KD', arSymbol:'د.ك', rate:0.084, label:'KWD - Kuwaiti Dinar', arLabel:'الدينار الكويتي' },
+]
+const CurrencyContext = createContext(null)
+function CurrencyProvider({ children }){
+  const { isAr } = useLang()
+  const [currency,setCurrency] = useState(() => {
+    try { const c = localStorage.getItem('amadora-currency'); return currencies.find(x=>x.code===c) || currencies[0] } catch { return currencies[0] }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('amadora-currency', currency.code) } catch { /* Storage can be blocked in private mode. */ }
+  }, [currency])
+  const fmt = useMemo(() => (aed) => {
+    const converted = (aed || 0) * currency.rate
+    const decimals = currency.code === 'KWD' ? 3 : 2
+    const amount = converted.toLocaleString(isAr?'ar-AE':'en-US',{minimumFractionDigits:decimals,maximumFractionDigits:decimals})
+    return `${isAr?currency.arSymbol:currency.symbol} ${amount}`
+  }, [currency,isAr])
+  const value = useMemo(() => ({ currency, currencies, setCurrency, fmt }), [currency, fmt])
+  return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>
+}
+function useCurrency(){ return useContext(CurrencyContext) }
+
+function BrandLogo({ small=false, light=false }){
+  const { isAr } = useLang()
+  return <div className={`brand-lockup ${small ? 'brand-lockup-small' : ''} ${light ? 'brand-lockup-light text-white' : 'text-[#181818]'}`}>
+    <span className={`brand-main ${isAr?'brand-main-ar':''}`}>{isAr?'أمادورا':'AMADORA'}</span>
+    <span className={`brand-sub ${isAr?'brand-sub-ar':''}`}>{isAr?'بوتيك':'BOUTIQUE'}</span>
+  </div>
+}
+
+function InstagramIcon({ className = 'w-5 h-5' }){
+  return <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3.6" y="3.6" width="16.8" height="16.8" rx="5.1" />
+    <circle cx="12" cy="12" r="4.05" />
+    <circle cx="17.35" cy="6.65" r=".9" fill="currentColor" stroke="none" />
+  </svg>
+}
+
+function WhatsAppIcon({ className = 'w-5 h-5' }){
+  return <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+    <path d="M12.04 2C6.57 2 2.12 6.42 2.12 11.86c0 1.74.46 3.44 1.33 4.94L2 22l5.35-1.4a9.96 9.96 0 0 0 4.69 1.18h.01c5.47 0 9.92-4.42 9.92-9.86A9.78 9.78 0 0 0 19.06 4.9 9.9 9.9 0 0 0 12.04 2Zm0 18.1h-.01a8.25 8.25 0 0 1-4.2-1.15l-.3-.18-3.18.83.85-3.08-.2-.32a8.14 8.14 0 0 1-1.25-4.34c0-4.5 3.72-8.17 8.29-8.17a8.3 8.3 0 0 1 5.86 2.42 8.08 8.08 0 0 1 2.43 5.8c0 4.51-3.72 8.18-8.29 8.18Zm4.55-6.12c-.25-.12-1.48-.73-1.7-.81-.23-.08-.4-.12-.57.12-.17.25-.65.8-.8.96-.15.17-.3.19-.55.07-.25-.13-1.06-.39-2.02-1.24-.75-.66-1.25-1.48-1.4-1.73-.14-.25-.01-.38.11-.5.12-.12.25-.3.38-.44.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.07-.12-.57-1.36-.78-1.86-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.08 0 1.23.9 2.42 1.03 2.58.12.17 1.77 2.69 4.3 3.77.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.48-.6 1.69-1.19.2-.58.2-1.08.14-1.18-.06-.1-.23-.17-.48-.29Z" />
+  </svg>
+}
+
+function Header(){
+  const { cartCount, setCartOpen } = useCart()
+  const { lang, isAr, t, toggleLang } = useLang()
+  const iconClass = 'w-[18px] h-[18px] md:w-[19px] md:h-[19px]'
+  const iconButton = 'grid place-items-center w-9 h-9 rounded-full border border-[#dedbd5] bg-white/55 hover:bg-[#111111] hover:text-white hover:border-[#1a1a1a] transition'
+  return <>
+    <div className="w-full max-w-full overflow-hidden h-[30px] bg-[#111111] flex items-center justify-center text-center text-[9px] md:text-[11px] tracking-[.18em] uppercase px-3 text-[#f5f1e8]">{t('promo')}</div>
+    <header className="w-full max-w-full overflow-hidden h-[76px] md:h-[104px] border-b border-[#dedbd5] bg-[#f7f6f2]/95 relative z-10 shadow-[0_12px_35px_rgba(17,17,17,0.045)]">
+      <div className="container-basic h-full grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-8 min-w-0">
+        <nav className="desktop-nav flex items-center gap-8 text-[11px] tracking-[.16em] uppercase text-[#202020]"><Link className="nav-luxe" to="/">{t('shop')}</Link><Link className="nav-luxe" to="/collection/new-arrivals">{t('new')}</Link><Link className="nav-luxe" to="/#collections">{t('collections')}</Link><Link className="nav-luxe" to="/collection/summer-idylls">{isAr?'سمر إيدلز':'Summer Idylls'}</Link></nav>
+        <Link to="/" className="justify-self-start md:justify-self-center shrink-0 px-2" aria-label={isAr?'الصفحة الرئيسية لأمادورا بوتيك':'AMADORA BOUTIQUE home'}><BrandLogo /></Link>
+        <div className="flex items-center justify-end gap-1.5 md:gap-2.5 text-[11px] shrink-0 min-w-0">
+          <Link to="/" className="desktop-nav mr-2 uppercase tracking-[.16em] text-[#202020] nav-luxe">{t('contact')}</Link>
+          <CurrencySwitcher/>
+          <button type="button" onClick={toggleLang} aria-label={isAr?'التبديل إلى الإنجليزية':'Switch to Arabic'} className="h-9 px-3 rounded-full border border-[#dedbd5] bg-white/70 inline-flex items-center justify-center text-[10px] md:text-[11px] font-semibold uppercase tracking-[.08em] hover:bg-[#111111] hover:text-white hover:border-[#1a1a1a] transition">{lang === 'ar' ? 'إنجليزي' : 'عربي'}</button>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label={isAr?'إنستغرام أمادورا بوتيك':'AMADORA BOUTIQUE Instagram'} className={iconButton}><InstagramIcon className={iconClass}/></a>
+          <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label={isAr?'واتساب أمادورا بوتيك':'AMADORA BOUTIQUE WhatsApp'} className={iconButton}><WhatsAppIcon className={iconClass}/></a>
+          <button className={`${iconButton} hidden md:grid`} aria-label={t('search')}><Search className={iconClass}/></button>
+          <button className={`${iconButton} hidden md:grid`} aria-label={t('account')}><User className={iconClass}/></button>
+          <button onClick={()=>setCartOpen(true)} className={`${iconButton} relative`} aria-label={t('cart')}><ShoppingBag className={iconClass}/>{cartCount>0 && <span className="absolute -right-1.5 -top-1.5 bg-[#171717] text-white rounded-full min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] leading-none border border-[#f7f6f2]">{cartCount}</span>}</button>
+        </div>
+      </div>
+    </header>
+  </>
+}
+function CartDrawer(){
+  const { cart, cartOpen, setCartOpen, subtotal, total, updateQty, removeItem } = useCart()
+  const { t, lang, isAr } = useLang()
+  const { fmt } = useCurrency()
+  return <AnimatePresence>
+    {cartOpen && <>
+      <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-[#171717]/45 backdrop-blur-[2px] z-50" onClick={()=>setCartOpen(false)} />
+      <motion.aside initial={{x:'100%'}} animate={{x:0}} exit={{x:'100%'}} transition={{type:'spring', damping:32, stiffness:300}} className="fixed right-0 top-0 h-full w-full max-w-[470px] bg-[#f7f6f2] z-50 shadow-[0_0_70px_rgba(0,0,0,0.28)] flex flex-col overflow-hidden">
+        <div className="border-b border-[#dedbd5] bg-[#ffffff] px-5 py-5 md:px-7">
+          <div className="flex items-center justify-between gap-4">
+            <div><p className="mb-1 text-[10px] uppercase tracking-[.24em] text-[#55514d]">{isAr?'أمادورا بوتيك':'AMADORA BOUTIQUE'}</p><h2 className="text-[16px] font-semibold uppercase tracking-[.18em]">{isAr?'سلة التسوق':'Your Cart'}</h2></div>
+            <button onClick={()=>setCartOpen(false)} aria-label={isAr?'إغلاق السلة':'Close cart'} className="grid h-11 w-11 place-items-center rounded-full border border-[#dedbd5] bg-white hover:bg-[#111111] hover:text-white transition"><X size={20}/></button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5 md:px-7">
+          {cart.length === 0 ? <div className="h-full grid place-items-center text-center"><div className="rounded-[30px] border border-[#dedbd5] bg-white p-9 shadow-[0_22px_60px_rgba(17,17,17,0.06)]"><ShoppingBag className="mx-auto mb-4" size={42}/><p className="mb-2 uppercase tracking-[.16em]">{isAr?'السلة فارغة':'Your cart is empty'}</p><p className="mb-6 text-sm leading-6 text-[#706c67]">{isAr?'أضيفي قطعة من أمادورا بوتيك لبدء الطلب.':'Add an Amadora Boutique piece to begin your order.'}</p><Link to="/collection/new-arrivals" onClick={()=>setCartOpen(false)} className="btn btn-black">{isAr?'تسوقي الجديد':'Shop new arrivals'}</Link></div></div> : <>
+            <div className="space-y-4">
+              {cart.map(item => <div key={item.key} className="rounded-[26px] border border-[#dedbd5] bg-white p-3.5 shadow-[0_16px_42px_rgba(17,17,17,0.055)]">
+                <div className="grid grid-cols-[96px_1fr] gap-4">
+                  <img src={item.image} className="h-[144px] w-[96px] rounded-[20px] bg-[#efede9] object-cover"/>
+                  <div className="min-w-0">
+                    <div className="flex items-start justify-between gap-3"><h3 className="pr-1 text-[12px] font-semibold uppercase tracking-[.07em] leading-5">{productName(item, lang)}</h3><button onClick={()=>removeItem(item.key)} aria-label={isAr?'إزالة القطعة':'Remove item'} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#e6e3de] text-[#706c67] hover:bg-[#111111] hover:text-white hover:border-[#1a1a1a] transition"><Trash2 size={15}/></button></div>
+                    <p className="mt-2 text-[11px] leading-5 text-[#706c67]">{isAr?'اللون':'Color'}: {productColorName(item.color || item.colorName, isAr)}</p>
+                    <p className="mt-3 text-[15px] font-semibold">{fmt(item.priceAed)}</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e8e6e1] pt-3">
+                  <div className="flex h-10 w-[118px] overflow-hidden rounded-full border border-[#dedbd5] bg-[#ffffff]"><button onClick={()=>updateQty(item.key, item.qty - 1)} className="flex-1 hover:bg-[#efede9]"><Minus size={14} className="mx-auto"/></button><span className="grid flex-1 place-items-center text-sm">{item.qty}</span><button onClick={()=>updateQty(item.key, item.qty + 1)} className="flex-1 hover:bg-[#efede9]"><Plus size={14} className="mx-auto"/></button></div>
+                  <p className="text-[14px] font-semibold">{fmt(item.priceAed * item.qty)}</p>
+                </div>
+              </div>)}
+            </div>
+          </>}
+        </div>
+
+        {cart.length > 0 && <div className="border-t border-[#dedbd5] bg-white px-5 py-5 md:px-7">
+          <div className="space-y-3 text-sm"><div className="flex justify-between"><span className="text-[#706c67]">{isAr?'المجموع الفرعي':'Subtotal'}</span><span>{fmt(subtotal)}</span></div><div className="flex justify-between border-t border-[#e2dfda] pt-4 text-xl font-semibold"><span>{isAr?'الإجمالي':'Total'}</span><span>{fmt(total)}</span></div></div>
+          <Link to="/checkout" onClick={()=>setCartOpen(false)} className="mt-5 flex h-[54px] w-full items-center justify-center rounded-full bg-[#171717] text-[13px] font-semibold uppercase tracking-[.16em] text-white hover:bg-[#111111] transition" style={{color:'#fff'}}>{t('checkout')} · {fmt(total)}</Link>
+          <button onClick={()=>setCartOpen(false)} className="mt-3 flex h-[50px] w-full items-center justify-center rounded-full border border-[#1a1a1a] bg-white text-[12px] font-semibold uppercase tracking-[.14em]">{t('continueShopping')}</button>
+        </div>}
+      </motion.aside>
+    </>}
+  </AnimatePresence>
+}
+
+function CurrencySwitcher(){
+  const { currency, currencies, setCurrency } = useCurrency()
+  const { isAr } = useLang()
+  const [open,setOpen] = useState(false)
+  const btnRef = useRef(null)
+  const [pos,setPos] = useState({right:20,top:80})
+  useEffect(() => {
+    if(open && btnRef.current){
+      const r = btnRef.current.getBoundingClientRect()
+      setPos({right:window.innerWidth - r.right - 4, top:r.bottom + 8})
+    }
+  }, [open])
+  return <div className="relative">
+    <button ref={btnRef} type="button" onClick={()=>setOpen(!open)} className="desktop-nav px-3 h-9 rounded-full border border-[#dedbd5] bg-white/70 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[.08em] hover:bg-[#111111] hover:text-white hover:border-[#1a1a1a] transition">{isAr?currency.arSymbol:currency.code}<svg width="8" height="6" viewBox="0 0 8 6" fill="none" className={`transition ${open?'rotate-180':''}`}><path d="M1 1.5L4 4.5L7 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg></button>
+    {open && <>
+      <div className="fixed inset-0 z-40" onClick={()=>setOpen(false)}/>
+      <div className="fixed z-50 min-w-[200px] rounded-[20px] border border-[#dedbd5] bg-white p-2 shadow-[0_25px_60px_rgba(0,0,0,0.15)]" style={{right:pos.right+'px', top:pos.top+'px'}}>
+        {currencies.map(c=><button key={c.code} onClick={()=>{setCurrency(c); setOpen(false)}} className={`w-full flex items-center gap-3 px-4 py-3 rounded-[14px] ${isAr?'text-right':'text-left'} text-[12px] transition ${currency.code===c.code?'bg-[#171717] text-white':'hover:bg-[#efede9]'}`}><span className="min-w-[48px] text-sm font-semibold">{isAr?c.arSymbol:c.symbol}</span><span className="opacity-70">{isAr?c.arLabel:c.label}</span></button>)}
+      </div>
+    </>}
+  </div>
+}
+function Footer(){
+  const { t, isAr } = useLang()
+  const shop=isAr?['وصل حديثاً','سمر إيدلز','كلاسي','تشكيلة السهرة','جميع القطع']:['New Arrivals','Summer Idylls','Classy','Evening Edit','All Pieces'];
+  const quick=isAr?['عن أمادورا بوتيك','تواصل','التوصيل والاسترجاع','الخصوصية','الشروط','العروض']:['About','Contact','Delivery & Returns','Privacy','Terms','Offers'];
+  return <footer className="footer-bg mt-16 md:mt-20">
+    <div className="mx-auto max-w-[1440px] md:px-8 md:py-10">
+      <div className="overflow-hidden border-y border-white/10 bg-[#111111] text-[#f3f1e9] shadow-[0_28px_80px_rgba(17,17,17,0.16)] md:rounded-[34px] md:border">
+        <div className="px-6 py-12 md:px-10 md:py-12 lg:px-12">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr_1.1fr] lg:gap-14">
+            <div className={isAr?'text-right':'text-left'}>
+              <div className="mb-5 flex justify-start"><BrandLogo light /></div>
+              <p className="max-w-[340px] text-[14px] leading-7 text-[#d1cec8]">{isAr?'تصاميم أنثوية من أبوظبي، بتعبير أمادورا.':'Feminine occasionwear from Abu Dhabi, expressed by Amadora.'}</p>
+              <div className="mt-6 flex flex-wrap gap-3"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[.06] px-5 text-[13px] transition hover:bg-white/12"><InstagramIcon className="h-4 w-4"/> {isAr?'إنستغرام':'Instagram'}</a><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[.06] px-5 text-[13px] transition hover:bg-white/12"><WhatsAppIcon className="h-4 w-4"/> {isAr?'واتساب':'WhatsApp'}</a></div>
+            </div>
+            <div className="grid grid-cols-2 gap-8 border-t border-white/15 pt-8 text-[13px] text-[#d1cec8] lg:border-t-0 lg:pt-0">
+              <div><h4 className="mb-5 text-[12px] font-semibold text-white">{isAr?'تسوقي':'Shop'}</h4><div className="grid gap-3">{shop.map(x=><Link key={x} to="/" className="transition hover:text-white">{x}</Link>)}</div></div>
+              <div><h4 className="mb-5 text-[12px] font-semibold text-white">{isAr?'الدعم':'Support'}</h4><div className="grid gap-3">{quick.map(x=><Link key={x} to="/" className="transition hover:text-white">{x}</Link>)}</div></div>
+            </div>
+            <div className="border-t border-white/15 pt-8 lg:border-t-0 lg:pt-0">
+              <h4 className="text-[16px] font-medium text-white">{isAr?'كوني أول من يعرف':'Be first to know'}</h4>
+              <p className="mt-2 max-w-sm text-[12px] leading-6 text-[#c8c5bf]">{isAr?'وصل حديثاً وأخبار أمادورا، مباشرة إلى بريدك.':'New arrivals and Amadora updates, sent directly to your inbox.'}</p>
+              <div className="mt-5 flex h-12 max-w-md overflow-hidden rounded-full border border-white/20 bg-white/[.08] focus-within:border-white/45"><input className="min-w-0 flex-1 bg-transparent px-5 text-[12px] text-white outline-none placeholder:text-[#b8b5af]" placeholder={isAr?'بريدك الإلكتروني':'Your email'}/><button className="shrink-0 bg-[#f1eee4] px-6 text-[11px] font-semibold text-[#111111] transition hover:bg-white">{isAr?'انضمي':'Join'}</button></div>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/15 pt-6 text-[11px] text-[#b8b5af] md:flex-row md:items-center md:justify-between"><span>{t('footerLang')} ⌄</span><span>{isAr?'© ٢٠٢٦ أمادورا بوتيك':'© 2026 AMADORA BOUTIQUE'}</span><span>{isAr?'أبل باي، تابي، تمارا، الدفع عند الاستلام':'Apple Pay, Tabby, Tamara, COD'}</span></div>
+        </div>
+      </div>
+    </div>
+  </footer>
+}
+function ProductCard({p, i=0}){
+  const { t, lang } = useLang()
+  const { fmt } = useCurrency()
+  return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className="product-card text-center relative group"><div className="relative"><Link to={`/product/${p.id}`} className="block relative bg-[#f7f7f7] overflow-hidden aspect-[2/3]"><img src={p.img} className="absolute inset-0 w-full h-full object-cover transition duration-300"/><img src={p.hover} className="hover-img absolute inset-0 w-full h-full object-cover transition duration-300"/></Link></div><h3 className="mt-5 mb-2 text-[13px] tracking-[.045em] font-medium uppercase leading-5"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3><p className="text-[11px] uppercase text-[#666]">{t('salePrice')}</p><p className="text-[13px] font-medium">{fmt(p.priceAed)}</p></motion.div>
+}
+function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#ddd] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-14">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
+const collectionPages = {
+  'new-arrivals': { title:'AMADORA BOUTIQUE New Arrivals', eyebrow:'Latest pieces', desc:'Explore the complete current Amadora Boutique selection.', arEyebrow:'وصل حديثاً', arDesc:'اكتشفي تشكيلة أمادورا بوتيك الحالية.', list:products },
+  'summer-idylls': { title:'Summer Idylls', eyebrow:'Summer Idylls 2025', desc:'Feminine silhouettes and soft tones from the Summer Idylls Collection 2025.', arEyebrow:'سمر إيدلز ٢٠٢٥', arDesc:'قصات أنثوية وألوان هادئة من مجموعة سمر إيدلز ٢٠٢٥.', list:products.filter(p => p.id!=='classy-sage-ruffle-dress') },
+  'classy': { title:'Classy', eyebrow:'Classy edit', desc:'The Classy sage ruffle dress.', arEyebrow:'تشكيلة كلاسي', arDesc:'فستان كلاسي سيج بأكمام كشكش.', list:products.filter(p => p.id==='classy-sage-ruffle-dress') },
+  'evening-edit': { title:'Evening Edit', eyebrow:'Evening edit', desc:'Amadora occasion pieces in soft, elegant tones.', arEyebrow:'تشكيلة السهرة', arDesc:'قطع أمادورا للمناسبات بألوان هادئة وأنيقة.', list:products.filter(p => ['peach-pleated-lace-gown','champagne-lace-sleeve-dress','white-lace-evening-dress'].includes(p.id)) },
+}
+const collectionSlug = (name) => name.includes('NEW') ? 'new-arrivals' : name.toLowerCase().replaceAll(' ','-')
+function Home(){
+  const { t, lang, isAr } = useLang()
+  const storyDetails = isAr ? [
+    ['أبوظبي','علامة أزياء مقرها أبوظبي.'],
+    ['الهوية','معنى الأنوثة، بتعبير أمادورا.'],
+    ['الطلب','تسوقي القطع المتوفرة أونلاين.'],
+  ] : [
+    ['Abu Dhabi','A fashion business based in Abu Dhabi.'],
+    ['Identity','The meaning of femininity, expressed by Amadora.'],
+    ['Ordering','Shop the available pieces online.'],
+  ]
+  return <main className="w-full max-w-full overflow-x-hidden bg-[#f7f6f2] text-[#181818]">
+    <section className="relative min-h-[680px] overflow-hidden bg-[#111111] text-[#f6f2e8] sm:min-h-[720px] md:min-h-[760px]">
+      <img src={assets.hero} alt={isAr?'تصميم من أمادورا بوتيك':'Amadora Boutique design'} className="absolute inset-0 h-full w-full object-cover object-[50%_center] md:object-[center_18%]"/>
+      <div className="absolute inset-0 bg-[#090909]/10"/>
+      <div className="absolute inset-x-0 bottom-0 h-[64%] bg-gradient-to-t from-[#101010]/95 via-[#181818]/58 to-transparent md:hidden"/>
+      <div className={`absolute inset-0 hidden md:block ${isAr?'bg-gradient-to-l from-[#101010]/92 via-[#181818]/48 to-transparent':'bg-gradient-to-r from-[#101010]/92 via-[#181818]/48 to-transparent'}`}/>
+      <div className="container-basic relative z-10 flex min-h-[680px] items-end sm:min-h-[720px] md:min-h-[760px] md:items-center">
+        <div className={`w-full max-w-2xl pb-16 pt-20 text-left md:py-24 ${isAr?'md:ml-auto':'md:mr-auto'}`}>
+          <p className="mb-4 text-[10px] font-semibold tracking-[.18em] text-[#d8e2dc] md:mb-6 md:text-[11px]">{isAr?'أمادورا بوتيك':'AMADORA BOUTIQUE'}</p>
+          <h1 className={`font-display font-medium text-white drop-shadow-[0_8px_30px_rgba(0,0,0,.18)] ${isAr?'max-w-[9ch] text-[50px] leading-[1.08] tracking-normal md:text-[82px] lg:text-[92px]':'max-w-[8ch] text-[58px] leading-[.92] tracking-[-.03em] md:text-[82px] lg:text-[96px]'}`}>{isAr?'معنى الأنوثة':'The Meaning of Femininity'}</h1>
+        </div>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-px bg-white/20"/>
+    </section>
+
+    <section id="collections" className="py-20 md:py-28">
+      <div className="container-basic">
+        <div className="mb-12 max-w-2xl">
+          <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'اختاروا إطلالتكم':'The Amadora edit'}</h2>
+          <p className="mt-5 max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'تفاصيل أنثوية وألوان هادئة للمناسبات.':'Feminine details and soft tones for special occasions.'}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className={`${index===0?'md:col-span-6':'md:col-span-2'} group relative min-h-[330px] overflow-hidden bg-[#efede9] md:min-h-[520px]`}><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"/><div className="absolute inset-0 bg-gradient-to-t from-[#111111]/75 via-transparent to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className={`${index===0?'text-2xl md:text-4xl':'text-base md:text-xl'} font-display leading-tight`}>{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/75">{t('openCollection')}</p></div></Link>)}</div>
+      </div>
+    </section>
+
+    <ProductGrid title="Amadora new arrivals" actionPath="/collection/new-arrivals" />
+
+    <section className="overflow-hidden bg-[#111111] text-[#f5f1e8]">
+      <div className="grid lg:grid-cols-2">
+        <div className="relative aspect-[4/5] min-h-[440px] w-full overflow-hidden lg:aspect-auto lg:min-h-[720px]"><img src={assets.brandPackaging} alt={isAr?'تصميم عاجي من أمادورا بوتيك':'Ivory Amadora Boutique design'} className="absolute inset-0 h-full w-full object-cover"/></div>
+        <div className="flex items-center px-[18px] py-16 md:px-12 md:py-20 lg:px-20 lg:py-24 xl:px-24">
+          <div className="w-full max-w-[680px]">
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[.3em] text-[#c8c5bf]">{isAr?'أمادورا بوتيك':'AMADORA BOUTIQUE'}</p>
+          <h2 className="max-w-[12ch] font-display text-[48px] font-medium leading-[.94] md:text-[68px]">{isAr?'التفاصيل هي الأساس':'Designed around the details'}</h2>
+          <p className={`mt-7 max-w-[280px] text-sm leading-8 text-[#dedbd5] md:max-w-xl ${isAr?'ml-auto md:ml-0':'mr-auto'}`}>{isAr?'تشكيلة بتفاصيل دانتيل وتطريز وقصات انسيابية للمناسبات.':'A focused occasionwear collection with lace, embroidery and flowing silhouettes.'}</p>
+          <div className="mt-10 grid gap-7 border-t border-white/20 pt-8 sm:grid-cols-3 sm:gap-5">{storyDetails.map(([title,body])=><div key={title}><h3 className="font-display text-2xl text-[#f5f1e8]">{title}</h3><p className="mt-2 text-xs leading-6 text-[#c8c5bf]">{body}</p></div>)}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <CustomerMoments/>
+  </main>
+}
+function CollectionPage(){ const { slug } = useParams(); const { lang, isAr, t } = useLang(); const collection = collectionPages[slug] || collectionPages['new-arrivals']; return <main className="bg-[#f7f6f2]"><section className="border-b border-[#dedbd5] py-14 md:py-20"><div className="container-basic text-center"><div className="mb-5 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[.18em] text-[#706c67]"><Link to="/" className="hover:text-[#181818]">{t('home')}</Link><span>/</span><span className="text-[#181818]">{collectionText(collection.title, lang)}</span></div><p className="mb-4 text-[11px] uppercase tracking-[.28em] text-[#55514d]">{isAr?collection.arEyebrow:collection.eyebrow}</p><h1 className="text-[30px] md:text-[48px] font-medium uppercase tracking-[.1em]">{collectionText(collection.title, lang)}</h1><p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-[#706c67]">{isAr?collection.arDesc:collection.desc}</p></div></section><ProductGrid title={`${collection.list.length} ${t('pieces')}`} list={collection.list}/></main> }
+const CUSTOMER_REVIEWS = [
+  { type:'image', src:'/images/amadora/reviews/review-01.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-02.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-03.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-04.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-05.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-06.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-07.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-08.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-09.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-10.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-11.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-12.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-13.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-14.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-15.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-16.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-17.webp' },
+  { type:'video', src:'/images/amadora/reviews/review-18.mp4', poster:'/images/amadora/reviews/review-18-poster.webp' },
+  { type:'image', src:'/images/amadora/reviews/review-19.webp' },
+  { type:'video', src:'/images/amadora/reviews/review-20.mp4', poster:'/images/amadora/reviews/review-20-poster.webp' },
+]
+function ReviewVideo({review,label}){
+  const videoRef = useRef(null)
+  useEffect(()=>{
+    const video = videoRef.current
+    if(!video) return
+    const observer = new IntersectionObserver(([entry])=>{
+      if(entry.isIntersecting) video.play().catch(()=>{})
+      else video.pause()
+    },{threshold:.15})
+    observer.observe(video)
+    return ()=>observer.disconnect()
+  },[])
+  return <video ref={videoRef} src={review.src} poster={review.poster} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture aria-label={label} className="h-full w-full object-cover"/>
+}
+function CustomerMoments(){
+  const { isAr } = useLang()
+  const marqueeRef = useRef(null)
+  const trackRef = useRef(null)
+  useEffect(()=>{
+    const viewport = marqueeRef.current
+    const track = trackRef.current
+    if(!viewport || !track) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let animationFrame
+    let lastFrame = performance.now()
+    let lastInteraction = -Infinity
+    let autoPosition = 0
+    let autoActive = true
+    let drag = null
+
+    const noteInteraction = ()=>{
+      lastInteraction = performance.now()
+      autoPosition = viewport.scrollLeft
+      autoActive = false
+    }
+    const onPointerDown = event=>{
+      noteInteraction()
+      if(event.pointerType!=='mouse' || event.button!==0) return
+      drag = { id:event.pointerId, x:event.clientX, left:viewport.scrollLeft }
+      viewport.setPointerCapture(event.pointerId)
+      viewport.style.cursor = 'grabbing'
+      viewport.style.userSelect = 'none'
+    }
+    const onPointerMove = event=>{
+      if(!drag || drag.id!==event.pointerId){
+        if(event.pointerType!=='mouse' && event.buttons) noteInteraction()
+        return
+      }
+      noteInteraction()
+      viewport.scrollLeft = drag.left - (event.clientX-drag.x)
+      event.preventDefault()
+    }
+    const endDrag = event=>{
+      noteInteraction()
+      if(!drag || drag.id!==event.pointerId) return
+      drag = null
+      viewport.style.cursor = ''
+      viewport.style.userSelect = ''
+    }
+    const onIntent = ()=>noteInteraction()
+    const groupWidth = ()=>track.scrollWidth/2
+    if(isAr) viewport.scrollLeft = groupWidth()
+    autoPosition = viewport.scrollLeft
+    const move = now=>{
+      const elapsed = Math.min(now-lastFrame,50)
+      lastFrame = now
+      const width = groupWidth()
+      const bounds = viewport.getBoundingClientRect()
+      const visible = bounds.bottom>0 && bounds.top<window.innerHeight
+      if(!reduceMotion && visible && now-lastInteraction>1800 && width>0){
+        if(!autoActive){
+          autoPosition = viewport.scrollLeft
+          autoActive = true
+        }
+        autoPosition += (isAr?-1:1)*elapsed*.06
+        while(autoPosition>=width) autoPosition-=width
+        while(autoPosition<0) autoPosition+=width
+        viewport.scrollLeft = autoPosition
+      }
+      animationFrame = requestAnimationFrame(move)
+    }
+
+    viewport.addEventListener('pointerdown',onPointerDown)
+    viewport.addEventListener('pointermove',onPointerMove)
+    viewport.addEventListener('pointerup',endDrag)
+    viewport.addEventListener('pointercancel',endDrag)
+    viewport.addEventListener('wheel',onIntent,{passive:true})
+    viewport.addEventListener('touchstart',onIntent,{passive:true})
+    viewport.addEventListener('keydown',onIntent)
+    animationFrame = requestAnimationFrame(move)
+    return ()=>{
+      cancelAnimationFrame(animationFrame)
+      viewport.removeEventListener('pointerdown',onPointerDown)
+      viewport.removeEventListener('pointermove',onPointerMove)
+      viewport.removeEventListener('pointerup',endDrag)
+      viewport.removeEventListener('pointercancel',endDrag)
+      viewport.removeEventListener('wheel',onIntent)
+      viewport.removeEventListener('touchstart',onIntent)
+      viewport.removeEventListener('keydown',onIntent)
+    }
+  },[isAr])
+  const group = (duplicate=false) => <div aria-hidden={duplicate || undefined} className="flex shrink-0 gap-5 pr-5">{CUSTOMER_REVIEWS.map((review,index)=><article key={review.src} dir={isAr?'rtl':'ltr'} className="w-[270px] shrink-0 overflow-hidden rounded-[28px] border border-[#dedbd5] bg-[#ffffff] md:w-[310px]">
+    <div className="aspect-[5/7] overflow-hidden bg-[#e8e6e1]">{review.type==='video'?<ReviewVideo review={duplicate?{...review,src:`${review.src}?marquee-copy=1`}:review} label={`${isAr?'فيديو تجربة عميلة أمادورا':'Amadora customer review video'} ${index+1}`}/>:<img src={review.src} alt={`${isAr?'تجربة عميلة أمادورا':'Amadora customer review'} ${index+1}`} loading="lazy" decoding="async" className="h-full w-full object-cover"/>}</div>
+    <div className="p-5 text-center"><h3 className="font-display text-[26px] leading-none text-[#202020]">{isAr?'تجربة عميلة أمادورا':'Amadora customer review'}</h3><p className="mt-3 text-[10px] font-semibold uppercase tracking-[.2em] text-[#706c67]">{isAr?'أمادورا بوتيك':'AMADORA BOUTIQUE'}</p></div>
+  </article>)}</div>
+  return <section className="overflow-hidden border-t border-[#dedbd5] bg-[#f4f2ee] py-20 md:py-28">
+    <div className="mb-10 text-center md:mb-14"><div className="container-basic"><h2 className="font-display text-[40px] font-medium leading-[1.12] text-[#181818] md:text-[58px]">{isAr?'أمادورا بعيون عميلاتنا':'Amadora through your eyes'}</h2><p className="mx-auto mt-4 max-w-xl text-[14px] leading-7 text-[#5f5b57] md:text-[15px]">{isAr?'لحظات حقيقية من أبرز قصص تقييمات أمادورا.':'Real moments from Amadora’s Instagram review highlight.'}</p></div></div>
+    <div ref={marqueeRef} className="customer-marquee-mask" tabIndex="0" aria-label={isAr?'اسحبي لاستعراض تجارب العميلات':'Drag or swipe to browse customer reviews'}><div ref={trackRef} className="customer-marquee-track flex w-max">{group()}{group(true)}</div></div>
+  </section>
+}
+
+const PRODUCT_COLORS = [
+  { name:'Peach', hex:'#e6b195', ar:'خوخي' },
+  { name:'Blush', hex:'#d9a5a8', ar:'وردي فاتح' },
+  { name:'Champagne', hex:'#d8c6a6', ar:'شامبين' },
+  { name:'Ice Blue', hex:'#b9d7e8', ar:'سماوي' },
+  { name:'Dusty Rose', hex:'#c88f99', ar:'وردي غباري' },
+  { name:'Sage', hex:'#aab39a', ar:'سيج' },
+  { name:'Ivory', hex:'#eee7d7', ar:'عاجي' },
+  { name:'White', hex:'#f7f7f2', ar:'أبيض' },
+]
+const productColorName = (color='Black', isAr=false) => {
+  const option = PRODUCT_COLORS.find(item => item.name.toLowerCase() === String(color).toLowerCase())
+  return isAr ? (option?.ar || 'اللون المحدد') : (option?.name || color)
+}
+function ProductPage(){
+  const { id } = useParams()
+  const product = products.find(p => p.id === id) || products[0]
+  const gallery = product.gallery?.length ? product.gallery : (product.id === products[0].id ? blackProductGallery : [product.img, product.hover])
+  const [main,setMain]=useState(gallery[0])
+  const [qty,setQty]=useState(1)
+  const defaultColor = PRODUCT_COLORS.find(option => option.name.toLowerCase() === product.colorName?.toLowerCase())?.name || (product.colorName === 'nude' ? 'Cream' : 'Black')
+  const [selectedColor,setSelectedColor]=useState(defaultColor)
+  const { addToCart } = useCart()
+  const { t, lang, isAr } = useLang()
+  const { fmt } = useCurrency()
+  const pname = productName(product, lang)
+  const galleryRef = useRef(null)
+  const firstGalleryImage = gallery[0]
+  useEffect(()=>{
+    const frame = requestAnimationFrame(() => {
+      setMain(firstGalleryImage)
+      setSelectedColor(defaultColor)
+      galleryRef.current?.scrollTo({left:0})
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [product.id, firstGalleryImage, defaultColor])
+  const linePrice = product.priceAed
+  const optionLabel = 'mb-3 block text-[11px] font-semibold uppercase tracking-[.18em] text-[#6f6b66]'
+  const addLine = () => addToCart({...product, image:main, priceAed:linePrice, color:selectedColor, qty})
+  const goToImage = (src, index) => {
+    setMain(src)
+    const carousel = galleryRef.current
+    carousel?.scrollTo({left:carousel.clientWidth * index, behavior:'smooth'})
+  }
+  const handleGalleryScroll = () => {
+    const carousel = galleryRef.current
+    if (!carousel?.clientWidth) return
+    const index = Math.min(gallery.length - 1, Math.max(0, Math.round(carousel.scrollLeft / carousel.clientWidth)))
+    if (gallery[index] && gallery[index] !== main) setMain(gallery[index])
+  }
+  const thumbs = gallery.map((src,index)=><button type="button" aria-label={isAr?`عرض الصورة ${index + 1} من ${gallery.length}`:`View image ${index + 1} of ${gallery.length}`} onClick={()=>goToImage(src,index)} key={src} className={`shrink-0 overflow-hidden rounded-[18px] border bg-white p-1 transition ${main===src?'border-[#1a1a1a] shadow-[0_12px_30px_rgba(0,0,0,0.12)]':'border-[#e2dfda] hover:border-[#55514d]'}`}><img src={src} className="h-[92px] w-[64px] md:h-[116px] md:w-[78px] rounded-[14px] object-cover"/></button>)
+
+  return <main className="bg-[#f7f6f2]">
+    <section className="container-basic py-2 md:py-10">
+      <div className="mb-3 md:mb-6 text-[11px] uppercase tracking-[.16em] text-[#706c67]"><Link to="/" className="hover:text-[#181818] transition">{t('home')}</Link><span className="mx-2.5 text-[#bfb7ae]">/</span><span>{t('abayas')}</span></div>
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(390px,.92fr)] lg:gap-12 xl:gap-16">
+        <div className="min-w-0">
+          <div className="relative overflow-hidden md:rounded-[28px]">
+            <div className="absolute left-4 top-4 z-10 flex gap-2"><span className="rounded-full bg-white/90 px-4 py-2 text-[10px] font-semibold uppercase tracking-[.18em] shadow-sm">{isAr?'أمادورا بوتيك':'AMADORA BOUTIQUE'}</span><span className="rounded-full bg-[#171717] px-4 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white shadow-sm">{t('new')}</span></div>
+            <button aria-label={isAr?'أضيفي إلى المفضلة':'Add to wishlist'} className="absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/90 shadow-sm"><Heart size={19}/></button>
+            <div className="relative md:hidden">
+              <div ref={galleryRef} data-gallery-carousel onScroll={handleGalleryScroll} className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {gallery.map((src,index)=><div key={src} className="w-full shrink-0 snap-center snap-always"><img src={src} alt={`${pname} - ${index + 1}`} draggable="false" className="w-full aspect-[3/4] select-none object-cover bg-[#f7f7f7]"/></div>)}
+              </div>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                {gallery.map((src,index)=><button type="button" aria-label={isAr?`عرض الصورة ${index + 1} من ${gallery.length}`:`View image ${index + 1} of ${gallery.length}`} aria-current={main===src?'true':undefined} key={src} onClick={()=>goToImage(src,index)} className={`h-2 w-2 rounded-full transition ${main===src?'bg-[#171717]':'bg-[#171717]/20'}`}/>)}
+              </div>
+            </div>
+            <img src={main} className="hidden w-full rounded-[28px] md:block md:aspect-[2/3] md:object-cover"/>
+          </div>
+          <div className="mt-4 flex gap-3 overflow-x-auto overscroll-x-contain pb-2 max-w-full md:mt-5">{thumbs}</div>
+        </div>
+        <aside className="min-w-0 lg:sticky lg:top-6 self-start">
+          <div className="rounded-[34px] border border-[#dedbd5] bg-white p-5 md:p-7 shadow-[0_28px_80px_rgba(17,17,17,0.075)]">
+            <div className="mb-5 flex items-start justify-between gap-4"><div><p className="mb-3 text-[11px] uppercase tracking-[.26em] text-[#55514d]">{t('premiumAbaya')}</p><h2 className="text-[22px] md:text-[28px] leading-[1.18] tracking-[.055em] uppercase font-medium">{pname}</h2></div><button className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#dedbd5]"><Share2 size={18}/></button></div>
+            <div className="mb-6 flex flex-wrap items-center gap-3"><BadgeCheck size={17} className="text-[#55514d]"/><span className="text-xs text-[#706c67]">{t('uaecustomers')}</span><span className="rounded-full bg-[#efede9] px-3 py-1 text-[11px] text-[#66635f]">{t('inStock')}</span></div>
+            <div className="mb-5 border-y border-[#dedbd5] py-4">
+              <div className="flex items-end justify-between gap-4">
+                <div><p className="text-[10px] uppercase tracking-[.18em] text-[#706c67]">{t('price')}</p><p className="mt-1 whitespace-nowrap text-[26px] font-semibold tracking-wide">{fmt(linePrice)}</p></div>
+              </div>
+              <p className="mt-3 border-t border-[#e6e3de] pt-3 text-[11px] leading-5 text-[#6f6b66]">{t('paymentLine')}</p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <span className={optionLabel}>{t('color')}: <b className="text-[#181818]">{isAr ? PRODUCT_COLORS.find(option=>option.name===selectedColor)?.ar : selectedColor}</b></span>
+                <div className="flex flex-wrap gap-3">{PRODUCT_COLORS.filter(option=>option.name===selectedColor).map(option=><span key={option.name} aria-label={`${t('color')}: ${isAr?option.ar:option.name}`} className="h-10 w-10 rounded-full border-2 border-white shadow-sm ring-2 ring-[#181818]" style={{backgroundColor:option.hex}} />)}</div>
+              </div>
+              <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
+            </div>
+
+            <div className="mt-7 grid gap-3 md:grid-cols-[124px_1fr]"><div className="flex h-[52px] overflow-hidden rounded-full border border-[#dedbd5]"><button onClick={()=>setQty(Math.max(1,qty-1))} className="flex-1"><Minus size={15} className="mx-auto"/></button><span className="grid flex-1 place-items-center text-sm">{qty}</span><button onClick={()=>setQty(qty+1)} className="flex-1"><Plus size={15} className="mx-auto"/></button></div><button onClick={addLine} className="h-[52px] rounded-full bg-[#171717] px-6 text-[13px] font-semibold uppercase tracking-[.14em] text-white">{t('addToCart')} · {fmt(linePrice * qty)}</button></div>
+            <Link to="/checkout" onClick={addLine} className="mt-3 flex h-[52px] items-center justify-center rounded-full border border-[#1a1a1a] bg-white text-[13px] font-semibold uppercase tracking-[.14em]">{t('buyNow')}</Link>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section className="container-basic pb-5 md:pb-8">
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        {[[isAr?'أبوظبي':'Abu Dhabi', isAr?'علامة أزياء مقرها أبوظبي':'Fashion business based in Abu Dhabi'],[isAr?'مرخصة':'Licensed', isAr?'مرخصة من دائرة التنمية الاقتصادية':'Licensed by the Department of Economic Development'],[isAr?'تواصل مباشر':'Direct support', isAr?'تأكيد عبر واتساب':'WhatsApp confirmation']].map(([title,body])=><div key={title} className="rounded-[22px] border border-[#dedbd5] bg-white/80 p-4"><BadgeCheck size={18} className="mb-3 text-[#55514d]"/><p className="text-[11px] font-semibold uppercase tracking-[.16em]">{title}</p><p className="mt-2 text-xs leading-5 text-[#706c67]">{body}</p></div>)}
+      </div>
+      <Accordions product={product}/>
+    </section>
+    <ProductGrid title={t('relatedProducts')} list={products.filter(p => p.id !== product.id).slice(0,4)} />
+  </main>
+}
+
+function Accordions({ product }){
+  const { lang, isAr } = useLang()
+  const rows=isAr?[
+    ['الوصف', productDesc(product, lang)],
+    ['الطلب','تواصلي معنا عبر واتساب لتأكيد تفاصيل الطلب والتوصيل.'],
+    ['أمادورا بوتيك','علامة أزياء مقرها أبوظبي ومرخصة من دائرة التنمية الاقتصادية.']
+  ]:[
+    ['Description', product.desc],
+    ['Ordering','Contact us on WhatsApp to confirm order and delivery details.'],
+    ['Amadora Boutique','A fashion business based in Abu Dhabi and licensed by the Department of Economic Development.']
+  ]
+  return <div className="mt-8 rounded-[28px] border border-[#dedbd5] bg-white/80 p-2 shadow-[0_18px_50px_rgba(17,17,17,0.045)]">{rows.map(([title,body],i)=><details key={title} className="group border-[#e8e6e1] open:bg-[#ffffff] rounded-[22px]" open={i===0}><summary className="flex cursor-pointer list-none items-center justify-between px-5 py-5 text-[12px] font-semibold uppercase tracking-[.16em]">{title}<Plus size={18} className="transition group-open:rotate-45"/></summary><p className="px-5 pb-5 text-sm leading-7 text-[#5f554c]">{body}</p></details>)}</div>
+}
+const PAYMENT_ASSET_BASE = '/images/amadora/payment-methods'
+function PaymentMethodMark({ id, isAr }){
+  const alt = {
+    visa:isAr?'فيزا':'Visa', mastercard:isAr?'ماستركارد':'Mastercard', applePay:isAr?'أبل باي':'Apple Pay',
+    tabby:isAr?'تابي':'Tabby', tamara:isAr?'تمارا':'Tamara',
+  }
+  if(id==='card') return <div className="flex h-8 items-center gap-1.5 rounded-[10px] bg-white px-2.5"><img src={`${PAYMENT_ASSET_BASE}/visa.svg`} alt={alt.visa} className="h-[13px] w-auto"/><img src={`${PAYMENT_ASSET_BASE}/mastercard.svg`} alt={alt.mastercard} className="h-[15px] w-auto"/><img src={`${PAYMENT_ASSET_BASE}/apple-pay.svg`} alt={alt.applePay} className="h-[16px] w-auto"/></div>
+  if(id==='tabby') return <div className="grid h-8 min-w-[64px] place-items-center rounded-[10px] bg-white px-2"><img src={`${PAYMENT_ASSET_BASE}/tabby.svg`} alt={alt.tabby} className="h-[21px] w-auto"/></div>
+  if(id==='tamara') return <div className="grid h-8 min-w-[78px] place-items-center rounded-[10px] bg-white px-2"><img src={`${PAYMENT_ASSET_BASE}/tamara.svg`} alt={alt.tamara} className="h-[15px] w-auto"/></div>
+  return <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-white text-[#1a1a1a]"><Banknote size={18} strokeWidth={1.6}/></div>
+}
+
+function Checkout(){
+  const { cart, subtotal, total, clearCart } = useCart()
+  const { lang, isAr, t } = useLang()
+  const { fmt } = useCurrency()
+  const [payment,setPayment]=useState('card')
+  const [done,setDone]=useState(null)
+  const codFee = 0
+  const grand = total + codFee
+  const field = 'h-[54px] w-full rounded-[16px] border border-[#dedbd5] bg-white/85 px-4 text-[13px] outline-none transition focus:border-[#1a1a1a] focus:ring-4 focus:ring-[#e8e6e1] placeholder:text-[#88847f]'
+  const label = 'mb-2 block text-[10px] font-semibold uppercase tracking-[.18em] text-[#706c67]'
+  const card = 'rounded-[28px] border border-[#dedbd5] bg-[#ffffff] p-5 md:p-7 shadow-[0_20px_55px_rgba(17,17,17,0.055)]'
+  const paymentMethods = isAr ? [
+    ['card','بطاقة ائتمان أو خصم','ادفعي بأمان ببطاقتك أو أبل باي',null],
+    ['tabby','تابي','ادفعي على ٤ دفعات بدون فوائد',null],
+    ['tamara','تمارا','قسّمي الدفع بسهولة',null],
+    ['cod','الدفع عند الاستلام','ادفعي عند وصول الطلب',null],
+  ] : [
+    ['card','Credit / Debit Card','Visa, Mastercard or Apple Pay',null],
+    ['tabby','Tabby','Pay in 4 interest-free installments',null],
+    ['tamara','Tamara','Split your payment easily',null],
+    ['cod','Cash on Delivery','Pay when your order arrives',null],
+  ]
+  const countries = isAr ? ['الإمارات العربية المتحدة','السعودية','الكويت','قطر','البحرين','عُمان'] : ['United Arab Emirates','Saudi Arabia','Kuwait','Qatar','Bahrain','Oman']
+  const emirates = isAr ? ['دبي','أبوظبي','الشارقة','عجمان','رأس الخيمة','الفجيرة','أم القيوين'] : ['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Fujairah','Umm Al Quwain']
+  function submit(e){ e.preventDefault(); setDone({ ref:`${isAr?'أمادورا':'AMADORA BOUTIQUE'}-${Date.now().toString().slice(-6)}`, total:grand, payment }); clearCart() }
+  if(done) return <main className="bg-[#f7f6f2] py-16 md:py-24"><div className="container-basic"><div className="max-w-2xl mx-auto rounded-[34px] border border-[#dedbd5] bg-white p-8 md:p-12 text-center shadow-[0_30px_90px_rgba(0,0,0,0.08)]"><div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full bg-[#efede9] text-[#55514d]"><CheckCircle2 size={34}/></div><p className="mb-3 text-[11px] uppercase tracking-[.24em] text-[#55514d]">{isAr?'تم تأكيد الطلب':'Order confirmed'}</p><h1 className="section-title mb-5">{isAr?'شكراً لكِ':'Thank you'}</h1><p className="text-lg mb-2">{isAr?'رقم الطلب':'Reference'}: <b>{done.ref}</b></p><p className="mb-7 text-[#6f6b66]">{isAr?'الإجمالي المؤكد':'Total confirmed'}: <b className="text-[#181818]">{fmt(done.total)}</b></p><div className="rounded-[22px] bg-[#efede9] p-5 text-sm leading-7 text-[#5f5b57]">{isAr?'تم استلام تفاصيل طلبك. ستتواصل أمادورا بوتيك عبر واتساب للتأكيد.':'Your order details were received. Amadora Boutique will contact you on WhatsApp to confirm.'}</div><Link to="/" className="btn btn-black mt-8">{t('continueShopping')}</Link></div></div></main>
+  if(cart.length===0) return <main className="bg-[#f7f6f2] py-20 md:py-28"><div className="container-basic text-center"><div className="mx-auto max-w-lg rounded-[30px] border border-[#dedbd5] bg-white p-10 shadow-[0_25px_70px_rgba(0,0,0,0.06)]"><ShoppingBag size={48} className="mx-auto mb-5"/><h1 className="section-title mb-5">{isAr?'السلة فارغة':'Your cart is empty'}</h1><p className="mb-7 text-sm text-[#706c67]">{isAr?'أضيفي قطعة لبدء الدفع الآمن داخل الإمارات.':'Add a piece to start your secure UAE checkout.'}</p><Link to="/" className="btn btn-black">{t('shopNow')}</Link></div></div></main>
+  return <main className="bg-[#f7f6f2] py-10 md:py-16"><div className="container-basic">
+    <div className="mb-8 md:mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><p className="mb-3 text-[11px] uppercase tracking-[.26em] text-[#55514d]">{isAr?'دفع آمن داخل الإمارات':'Secure UAE checkout'}</p><h1 className="text-[30px] md:text-[44px] font-medium uppercase tracking-[.08em]">{t('checkout')}</h1><p className="mt-3 max-w-xl text-sm leading-7 text-[#706c67]">{isAr?'أسعار بالدرهم وخيارات تابي وتمارا والبطاقة والدفع عند الاستلام.':'AED pricing with Tabby, Tamara, card and COD options.'}</p></div><div className="grid grid-cols-3 gap-2 rounded-full border border-[#dedbd5] bg-white/70 p-1 text-[10px] uppercase tracking-[.14em] text-[#706c67]"><span className="rounded-full bg-[#171717] px-4 py-3 text-center text-white">{isAr?'البيانات':'Details'}</span><span className="px-4 py-3 text-center">{isAr?'الدفع':'Payment'}</span><span className="px-4 py-3 text-center">{isAr?'تأكيد':'Confirm'}</span></div></div>
+    <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-start"><div className="space-y-6">
+      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠١':'01'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'التواصل':'Contact'}</h2></div><span className="rounded-full bg-[#efede9] px-4 py-2 text-[11px] text-[#66635f]">{isAr?'تحديثات الطلب':'Order updates'}</span></div><div><label className={label}>{isAr?'البريد الإلكتروني':'Email address'}</label><input required type="email" placeholder={isAr?'البريد الإلكتروني':'name@email.com'} className={field}/></div><label className="mt-4 flex items-center gap-3 text-sm text-[#706c67]"><input type="checkbox" defaultChecked className="accent-[#111111]"/> {isAr?'أرسلي لي العروض وتحديثات الطلب عبر البريد':'Send me offers and order updates by email'}</label></section>
+      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠٢':'02'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'بيانات التوصيل':'Delivery details'}</h2></div><Truck size={24} className="text-[#55514d]"/></div><div className="grid gap-4 md:grid-cols-2"><div><label className={label}>{isAr?'الاسم الأول':'First name'}</label><input required placeholder={isAr?'الاسم الأول':'First name'} className={field}/></div><div><label className={label}>{isAr?'اسم العائلة':'Last name'}</label><input required placeholder={isAr?'اسم العائلة':'Last name'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'رقم الهاتف':'Phone number'}</label><input required placeholder={isAr?'+٩٧١ ٥٠ ١٢٣ ٤٥٦٧':'+971 XX XXX XXXX'} className={field}/></div><div><label className={label}>{isAr?'الدولة':'Country'}</label><select className={field}>{countries.map(x=><option key={x}>{x}</option>)}</select></div><div><label className={label}>{isAr?'الإمارة':'Emirate'}</label><select className={field}>{emirates.map(x=><option key={x}>{x}</option>)}</select></div><div className="md:col-span-2"><label className={label}>{isAr?'العنوان الكامل':'Full address'}</label><input required placeholder={isAr?'فيلا / شقة / شارع':'Villa / Apartment / Street'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'المنطقة أو أقرب معلم':'Area or landmark'}</label><input placeholder={isAr?'المنطقة، المبنى، أقرب معلم':'Area, building, nearest landmark'} className={field}/></div></div><div className="mt-5 rounded-[22px] border border-[#e6e3de] bg-[#efede9] p-4 text-sm leading-7 text-[#5f5b57]">{isAr?'يتم تأكيد تفاصيل التوصيل عبر واتساب بعد الطلب.':'Delivery details are confirmed by WhatsApp after ordering.'}</div></section>
+      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠٣':'03'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'الدفع':'Payment'}</h2></div><CreditCard size={24} className="text-[#55514d]"/></div><div className="grid gap-2.5 md:grid-cols-2">{paymentMethods.map(([id,title,desc,fee])=>{ const selected=payment===id; return <button type="button" aria-pressed={selected} onClick={()=>setPayment(id)} key={id} className={`min-h-[86px] rounded-[18px] border p-3.5 text-left transition ${selected?'border-[#1a1a1a] bg-[#171717] text-white shadow-[0_10px_28px_rgba(0,0,0,0.14)]':'border-[#dedbd5] bg-white hover:border-[#88847f]'}`}><div className="flex items-center gap-3"><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><b className="text-[13px] leading-5">{title}</b>{fee&&<span className={`rounded-full px-2 py-0.5 text-[9px] ${selected?'bg-white/15 text-white':'bg-[#efede9] text-[#66635f]'}`}>{fee}</span>}</div><p className={`mt-1 text-[11px] leading-5 ${selected?'text-white/70':'text-[#706c67]'}`}>{desc}</p></div><PaymentMethodMark id={id} isAr={isAr}/><span className={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full border ${selected?'border-white bg-white':'border-[#aaa6a0] bg-[#f8faf8]'}`}>{selected&&<span className="h-1.5 w-1.5 rounded-full bg-[#1a1a1a]"/>}</span></div></button>})}</div>{payment==='card' && <div className="mt-5 grid gap-4 md:grid-cols-2"><div className="md:col-span-2"><label className={label}>{isAr?'رقم البطاقة':'Card number'}</label><input required placeholder={isAr?'١٢٣٤ ١٢٣٤ ١٢٣٤ ١٢٣٤':'1234 1234 1234 1234'} className={field}/></div><div><label className={label}>{isAr?'تاريخ الانتهاء':'Expiry'}</label><input required placeholder={isAr?'شهر / سنة':'MM / YY'} className={field}/></div><div><label className={label}>{isAr?'رمز الأمان':'CVV'}</label><input required placeholder={isAr?'رمز الأمان':'CVV'} className={field}/></div></div>}</section>
+    </div>
+    <aside className="rounded-[32px] border border-[#dedbd5] bg-white p-5 md:p-6 shadow-[0_28px_80px_rgba(17,17,17,0.075)] lg:sticky lg:top-6"><div className="mb-5 flex items-center justify-between"><h2 className="text-sm font-semibold uppercase tracking-[.18em]">{isAr?'ملخص الطلب':'Order summary'}</h2><span className="rounded-full bg-[#efede9] px-3 py-1 text-[11px] text-[#66635f]">{cart.length} {isAr?'قطعة':`item${cart.length>1?'s':''}`}</span></div><div className="max-h-[360px] space-y-4 overflow-auto pr-1">{cart.map(item=><div key={item.key} className="grid grid-cols-[82px_1fr] gap-4 rounded-[22px] border border-[#e8e6e1] bg-[#ffffff] p-3"><img src={item.image} className="h-[123px] w-[82px] rounded-[16px] bg-[#f7f7f7] object-cover"/><div className="min-w-0"><p className="text-[12px] font-medium uppercase leading-5 tracking-[.05em]">{productName(item, lang)}</p><p className="mt-2 text-[11px] leading-5 text-[#706c67]">{isAr?'الكمية':'Qty'} {item.qty} · {isAr?'اللون':'Color'} {productColorName(item.color || item.colorName, isAr)}</p><p className="mt-3 font-semibold">{fmt(item.priceAed * item.qty)}</p></div></div>)}</div><div className="my-5 rounded-[22px] bg-[#efede9] p-4 text-xs leading-6 text-[#6f6b66]"><div className="flex items-center gap-2 font-semibold text-[#181818]"><BadgeCheck size={16}/> {isAr?'دفع محمي':'Protected checkout'}</div><p className="mt-1">{isAr?'أسعار بالدرهم وتأكيد عبر واتساب.':'AED pricing and WhatsApp confirmation.'}</p></div><div className="space-y-3 border-t border-[#e2dfda] pt-5 text-sm"><div className="flex justify-between"><span>{isAr?'المجموع الفرعي':'Subtotal'}</span><span>{fmt(subtotal)}</span></div><div className="flex justify-between"><span>{isAr?'الشحن':'Shipping'}</span><span>{isAr?'يتم التأكيد':'Confirmed separately'}</span></div>{codFee>0 && <div className="flex justify-between"><span>{isAr?'رسوم الدفع عند الاستلام':'COD fee'}</span><span>{fmt(codFee)}</span></div>}<div className="flex justify-between border-t border-[#e2dfda] pt-4 text-lg font-semibold"><span>{isAr?'الإجمالي':'Total'}</span><span>{fmt(grand)}</span></div></div><button className="btn btn-black w-full mt-6">{isAr?'تأكيد الطلب':'Place order'} · {fmt(grand)}</button><p className="mt-4 text-center text-[11px] leading-5 text-[#67776e]">{isAr?'بإتمام الطلب، توافقين على التواصل عبر واتساب لتأكيد التوصيل.':'By placing your order you agree to be contacted on WhatsApp for delivery confirmation.'}</p></aside>
+    </form></div></main>
+}
+function FloatingWhatsApp(){
+  const { isAr } = useLang()
+  return <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label={isAr?'تواصلي مع أمادورا بوتيك عبر واتساب':'Chat with AMADORA BOUTIQUE on WhatsApp'} className={`fixed bottom-4 z-40 grid h-[56px] w-[56px] place-items-center rounded-full bg-[#25D366] text-white shadow-2xl transition hover:scale-105 md:bottom-5 md:h-[62px] md:w-[62px] ${isAr?'left-4 md:left-5':'right-4 md:right-5'}`}><WhatsAppIcon className="h-[30px] w-[30px] md:h-[34px] md:w-[34px]"/></a>
+}
+function ScrollReset(){
+  useLayoutEffect(()=>{
+    window.scrollTo({ top:0, left:0, behavior:'instant' })
+  },[])
+  return null
+}
+function Shell(){ const {pathname}=useLocation(); return <><Header/><CartDrawer/><AnimatePresence><motion.div key={pathname} initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:.28,ease:'easeOut'}}><ScrollReset/><Routes location={pathname}><Route path="/" element={<Home/>}/><Route path="/product/:id" element={<ProductPage/>}/><Route path="/collection/:slug" element={<CollectionPage/>}/><Route path="/checkout" element={<Checkout/>}/></Routes></motion.div></AnimatePresence><Footer/><FloatingWhatsApp/></> }
+function App(){ return <LanguageProvider><CurrencyProvider><CartProvider><Shell/></CartProvider></CurrencyProvider></LanguageProvider> }
+export default App
