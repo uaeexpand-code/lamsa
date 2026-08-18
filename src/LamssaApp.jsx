@@ -2,7 +2,7 @@ import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Banknote, CheckCircle2, CreditCard, Heart, Minus, Plus, Search, Share2, ShoppingBag, Trash2, Truck, User, X } from 'lucide-react'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { assets, blackProductGallery, collections, products } from './data'
+import { assets, blackProductGallery, collections, products, FLAVORS } from './data'
 
 const CartContext = createContext(null)
 const LanguageContext = createContext(null)
@@ -478,8 +478,7 @@ function ProductPage(){
   const gallery = product.gallery?.length ? product.gallery : (product.id === products[0].id ? blackProductGallery : [product.img, product.hover])
   const [main,setMain]=useState(gallery[0])
   const [qty,setQty]=useState(1)
-  const defaultColor = PRODUCT_COLORS.find(option => option.name.toLowerCase() === product.colorName?.toLowerCase())?.name || (product.colorName === 'nude' ? 'Cream' : 'Black')
-  const [selectedColor,setSelectedColor]=useState(defaultColor)
+  const [selectedFlavor,setSelectedFlavor]=useState(FLAVORS[0])
   const { addToCart } = useCart()
   const { t, lang, isAr } = useLang()
   const { fmt } = useCurrency()
@@ -489,14 +488,14 @@ function ProductPage(){
   useEffect(()=>{
     const frame = requestAnimationFrame(() => {
       setMain(firstGalleryImage)
-      setSelectedColor(defaultColor)
+      setSelectedFlavor(FLAVORS[0])
       galleryRef.current?.scrollTo({left:0})
     })
     return () => cancelAnimationFrame(frame)
-  }, [product.id, firstGalleryImage, defaultColor])
+  }, [product.id, firstGalleryImage])
   const linePrice = product.priceAed
   const optionLabel = 'mb-3 block text-[11px] font-semibold uppercase tracking-[.18em] text-[#6f6b66]'
-  const addLine = () => addToCart({...product, image:main, priceAed:linePrice, color:selectedColor, qty})
+  const addLine = () => addToCart({...product, image:selectedFlavor.img, priceAed:linePrice, color:selectedFlavor.name, qty})
   const goToImage = (src, index) => {
     setMain(src)
     const carousel = galleryRef.current
@@ -543,8 +542,8 @@ function ProductPage(){
 
             <div className="space-y-6">
               <div>
-                <span className={optionLabel}>{t('color')}: <b className="text-[#181818]">{isAr ? PRODUCT_COLORS.find(option=>option.name===selectedColor)?.ar : selectedColor}</b></span>
-                <div className="flex flex-wrap gap-3">{PRODUCT_COLORS.filter(option=>option.name===selectedColor).map(option=><span key={option.name} aria-label={`${t('color')}: ${isAr?option.ar:option.name}`} className="h-10 w-10 rounded-full border-2 border-white shadow-sm ring-2 ring-[#181818]" style={{backgroundColor:option.hex}} />)}</div>
+                <span className={optionLabel}>{isAr?'النكهة':'Flavor'}: <b className="text-[#181818]">{isAr ? selectedFlavor.arName : selectedFlavor.name}</b></span>
+                <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>{setSelectedFlavor(flavor); const idx = FLAVORS.findIndex(f=>f.id===flavor.id); goToImage(flavor.img, idx)}} aria-label={isAr?flavor.arName:flavor.name} className={`h-11 w-11 rounded-full border-2 transition ${selectedFlavor.id===flavor.id?'border-[#181818] ring-2 ring-[#181818] ring-offset-2':'border-[#e8e6e1] hover:border-[#999]'}`} style={{backgroundColor:flavor.hex}} />)}</div>
               </div>
               <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
             </div>
