@@ -14,12 +14,12 @@ export const collections = [
 ]
 
 export const FLAVORS = [
-  { id:'strawberry', name:'Strawberry', arName:'فراولة', hex:'#e63946', img:'/images/lamssa/products/edible-bikini/strawberry.png' },
-  { id:'cherry', name:'Cherry', arName:'كرز', hex:'#c1121f', img:'/images/lamssa/products/edible-bikini/cherry.png' },
-  { id:'mango', name:'Mango', arName:'مانجو', hex:'#f4a020', img:'/images/lamssa/products/edible-bikini/mango.png' },
-  { id:'pineapple', name:'Pineapple', arName:'أناناس', hex:'#f4c542', img:'/images/lamssa/products/edible-bikini/pineapple.png' },
-  { id:'grape', name:'Grape', arName:'عنب', hex:'#7b2d8b', img:'/images/lamssa/products/edible-bikini/grape.png' },
-  { id:'chocolate', name:'Chocolate', arName:'شوكولاتة', hex:'#3d1e10', img:'/images/lamssa/products/edible-bikini/chocolate.png' },
+  { id:'strawberry', name:'Strawberry', arName:'فراولة', hex:'#e63946', emoji:'🍓', img:'/images/lamssa/products/edible-bikini/strawberry.png' },
+  { id:'cherry', name:'Cherry', arName:'كرز', hex:'#c1121f', emoji:'🍒', img:'/images/lamssa/products/edible-bikini/cherry.png' },
+  { id:'mango', name:'Mango', arName:'مانجو', hex:'#f4a020', emoji:'🥭', img:'/images/lamssa/products/edible-bikini/mango.png' },
+  { id:'pineapple', name:'Pineapple', arName:'أناناس', hex:'#f4c542', emoji:'🍍', img:'/images/lamssa/products/edible-bikini/pineapple.png' },
+  { id:'grape', name:'Grape', arName:'عنب', hex:'#7b2d8b', emoji:'🍇', img:'/images/lamssa/products/edible-bikini/grape.png' },
+  { id:'chocolate', name:'Chocolate', arName:'شوكولاتة', hex:'#3d1e10', emoji:'🍫', img:'/images/lamssa/products/edible-bikini/chocolate.png' },
 ]
 
 export const products = [
