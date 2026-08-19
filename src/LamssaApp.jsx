@@ -303,19 +303,18 @@ function Home(){
     ['Delivery','UAE 24h delivery, Gulf 3-4 days.'],
   ]
   return <main className="w-full max-w-full overflow-x-hidden bg-[#ffffff] text-[#181818]">
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#fff0f3] via-[#fde4ec] to-[#f9cdda]">
-      <div className="container-basic relative z-10 grid items-center gap-8 py-16 md:min-h-[620px] md:grid-cols-2 md:gap-6 md:py-20">
-        <div className={`text-center md:text-start ${isAr?'md:order-2':'md:order-1'}`}>
+    <section className="relative overflow-hidden bg-[#fbe0e8]">
+      <img src="/images/lamssa/hero.png" alt={isAr?'منتجات لمسة':'Lamssa products'} className="absolute inset-0 h-full w-full object-cover object-[70%_center]"/>
+      <div className={`absolute inset-0 ${isAr?'bg-gradient-to-l':'bg-gradient-to-r'} from-[#fbe4ec]/95 via-[#fbe4ec]/55 to-transparent md:from-[#fbe4ec]/90 md:via-[#fbe4ec]/35`}/>
+      <div className="container-basic relative z-10 flex min-h-[560px] items-center py-16 md:min-h-[660px] md:py-20">
+        <div className={`w-full max-w-xl text-center ${isAr?'md:mr-0 md:ml-auto md:text-right':'md:ml-0 md:mr-auto md:text-left'}`}>
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[.3em] text-[#d4567a]">{isAr?'لمسة · ذوق يلامس الإحساس':'LAMSSA'}</p>
-          <h1 className={`font-display font-medium text-[#3d2b30] ${isAr?'text-[44px] leading-[1.12] md:text-[74px]':'text-[46px] leading-[.95] tracking-[-.02em] md:text-[80px]'}`}>{isAr?'ذوق يلامس الإحساس':'Taste That Touches The Senses'}</h1>
+          <h1 className={`font-display font-medium text-[#3d2b30] drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] ${isAr?'text-[44px] leading-[1.12] md:text-[76px]':'text-[46px] leading-[.95] tracking-[-.02em] md:text-[82px]'}`}>{isAr?'ذوق يلامس الإحساس':'Taste That Touches The Senses'}</h1>
           <p className="mx-auto mt-6 max-w-md text-[15px] leading-8 text-[#6b545a] md:mx-0">{isAr?'منتجات حميمية مميزة للمتزوجين 💗 توصيل الإمارات خلال ٢٤ ساعة والخليج ٣-٤ أيام.':'Premium intimate products for married couples 💗 UAE delivery in 24h, Gulf in 3-4 days.'}</p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
-            <Link to="/collection/edible-bikini" className="flex h-[54px] items-center justify-center rounded-full bg-[#d4567a] px-8 text-[13px] font-semibold uppercase tracking-[.14em] text-white transition hover:bg-[#b8435f]">{isAr?'تسوق الآن':'Shop now'}</Link>
+          <div className={`mt-8 flex flex-wrap items-center justify-center gap-3 ${isAr?'md:justify-end':'md:justify-start'}`}>
+            <Link to="/collection/edible-bikini" className="flex h-[54px] items-center justify-center rounded-full bg-[#d4567a] px-8 text-[13px] font-semibold uppercase tracking-[.14em] text-white shadow-lg transition hover:bg-[#b8435f]">{isAr?'تسوق الآن':'Shop now'}</Link>
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-[54px] items-center justify-center gap-2 rounded-full border border-[#d4567a]/40 bg-white px-6 text-[13px] font-semibold uppercase tracking-[.12em] text-[#b8435f] transition hover:bg-[#fff0f3]"><WhatsAppIcon className="h-4 w-4"/> {isAr?'اطلب واتساب':'Order on WhatsApp'}</a>
           </div>
-        </div>
-        <div className={`relative ${isAr?'md:order-1':'md:order-2'}`}>
-          <div className="mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-[32px] border-[3px] border-white bg-white shadow-[0_30px_80px_rgba(212,86,122,0.28)]"><img src={assets.hero} alt={isAr?'منتجات لمسة':'Lamssa products'} className="h-full w-full object-cover"/></div>
         </div>
       </div>
     </section>
