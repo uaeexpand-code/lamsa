@@ -279,9 +279,24 @@ function Footer(){
   </footer>
 }
 function ProductCard({p, i=0}){
-  const { t, lang, isAr } = useLang()
+  const { lang, isAr } = useLang()
   const { fmt } = useCurrency()
-  return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className="product-card text-center relative group"><div className="relative"><Link to={`/product/${p.id}`} className="block relative bg-white overflow-hidden aspect-square rounded-[20px]">{p.badge && <span className="absolute left-3 top-3 z-10 rounded-full bg-[#d4567a] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.06em] text-white shadow-sm">{isAr?p.badge.ar:p.badge.en}</span>}<img src={p.img} className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/><img src={p.hover} className="hover-img absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/></Link></div><h3 className="mt-5 mb-2 text-[13px] tracking-[.045em] font-medium uppercase leading-5"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3><p className="text-[11px] uppercase text-[#666]">{t('salePrice')}</p><p className="text-[13px] font-medium flex items-center justify-center gap-2">{p.compareAtAed && <span className="text-[#b89ba2] line-through font-normal">{fmt(p.compareAtAed)}</span>}<span className={p.compareAtAed?'text-[#d4567a] font-semibold':''}>{fmt(p.priceAed)}</span></p></motion.div>
+  const { addToCart } = useCart()
+  const discount = p.compareAtAed ? Math.round((1 - p.priceAed / p.compareAtAed) * 100) : 0
+  const quickAdd = (e) => { e.preventDefault(); e.stopPropagation(); addToCart({...p, image:p.img, priceAed:p.priceAed, color:p.colorName, qty:1}) }
+  return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className={`product-card group relative ${isAr?'text-right':'text-left'}`}>
+    <Link to={`/product/${p.id}`} className="block relative bg-white overflow-hidden aspect-square rounded-[18px]">
+      {discount > 0 && <span className="absolute left-3 top-3 z-10 bg-[#d4567a] px-3 py-1.5 text-[12px] font-bold text-white shadow-sm" style={{borderRadius:'16px 16px 16px 4px'}}>-{discount}%</span>}
+      <img src={p.img} className="absolute inset-0 w-[82%] h-[82%] m-auto object-contain transition duration-300"/>
+      <img src={p.hover} className="hover-img absolute inset-0 w-[82%] h-[82%] m-auto object-contain transition duration-300"/>
+      <button onClick={quickAdd} aria-label={isAr?'أضف للسلة':'Add to cart'} className="absolute bottom-3 right-3 z-10 grid h-11 w-11 place-items-center rounded-[10px] bg-white text-[#d4567a] shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition hover:bg-[#d4567a] hover:text-white"><Plus size={20}/></button>
+    </Link>
+    <h3 className="mt-4 mb-2 text-[14px] font-medium leading-5 text-[#333]"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3>
+    <div className={`flex items-center gap-2.5 ${isAr?'flex-row-reverse justify-end':''}`}>
+      <span className="text-[17px] font-bold text-[#d4567a]">{fmt(p.priceAed)}</span>
+      {p.compareAtAed && <span className="text-[13px] text-[#b0b0b0] line-through">{fmt(p.compareAtAed)}</span>}
+    </div>
+  </motion.div>
 }
 function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 md:gap-x-8">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
 const collectionPages = {
