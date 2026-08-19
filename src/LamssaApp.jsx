@@ -303,18 +303,21 @@ function Home(){
     ['Delivery','UAE 24h delivery, Gulf 3-4 days.'],
   ]
   return <main className="w-full max-w-full overflow-x-hidden bg-[#ffffff] text-[#181818]">
-    <section className="relative min-h-[680px] overflow-hidden bg-[#d4567a] text-[#f6f2e8] sm:min-h-[720px] md:min-h-[760px]">
-      <img src={assets.hero} alt={isAr?'منتجات لمسة':'Lamssa products'} className="absolute inset-0 h-full w-full object-cover object-[50%_center] md:object-[center_18%]"/>
-      <div className="absolute inset-0 bg-[#090909]/10"/>
-      <div className="absolute inset-x-0 bottom-0 h-[64%] bg-gradient-to-t from-[#101010]/95 via-[#181818]/58 to-transparent md:hidden"/>
-      <div className={`absolute inset-0 hidden md:block ${isAr?'bg-gradient-to-l from-[#101010]/92 via-[#181818]/48 to-transparent':'bg-gradient-to-r from-[#101010]/92 via-[#181818]/48 to-transparent'}`}/>
-      <div className="container-basic relative z-10 flex min-h-[680px] items-end sm:min-h-[720px] md:min-h-[760px] md:items-center">
-        <div className={`w-full max-w-2xl pb-16 pt-20 text-left md:py-24 ${isAr?'md:ml-auto':'md:mr-auto'}`}>
-          <p className="mb-4 text-[10px] font-semibold tracking-[.18em] text-[#d8e2dc] md:mb-6 md:text-[11px]">{isAr?'لمسة':'LAMSSA'}</p>
-          <h1 className={`font-display font-medium text-white drop-shadow-[0_8px_30px_rgba(0,0,0,.18)] ${isAr?'max-w-[9ch] text-[50px] leading-[1.08] tracking-normal md:text-[82px] lg:text-[92px]':'max-w-[8ch] text-[58px] leading-[.92] tracking-[-.03em] md:text-[82px] lg:text-[96px]'}`}>{isAr?'ذوق يلامس الإحساس':'Taste That Touches The Senses'}</h1>
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#fff0f3] via-[#fde4ec] to-[#f9cdda]">
+      <div className="container-basic relative z-10 grid items-center gap-8 py-16 md:min-h-[620px] md:grid-cols-2 md:gap-6 md:py-20">
+        <div className={`text-center md:text-start ${isAr?'md:order-2':'md:order-1'}`}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[.3em] text-[#d4567a]">{isAr?'لمسة · ذوق يلامس الإحساس':'LAMSSA'}</p>
+          <h1 className={`font-display font-medium text-[#3d2b30] ${isAr?'text-[44px] leading-[1.12] md:text-[74px]':'text-[46px] leading-[.95] tracking-[-.02em] md:text-[80px]'}`}>{isAr?'ذوق يلامس الإحساس':'Taste That Touches The Senses'}</h1>
+          <p className="mx-auto mt-6 max-w-md text-[15px] leading-8 text-[#6b545a] md:mx-0">{isAr?'منتجات حميمية مميزة للمتزوجين 💗 توصيل الإمارات خلال ٢٤ ساعة والخليج ٣-٤ أيام.':'Premium intimate products for married couples 💗 UAE delivery in 24h, Gulf in 3-4 days.'}</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+            <Link to="/collection/edible-bikini" className="flex h-[54px] items-center justify-center rounded-full bg-[#d4567a] px-8 text-[13px] font-semibold uppercase tracking-[.14em] text-white transition hover:bg-[#b8435f]">{isAr?'تسوق الآن':'Shop now'}</Link>
+            <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-[54px] items-center justify-center gap-2 rounded-full border border-[#d4567a]/40 bg-white px-6 text-[13px] font-semibold uppercase tracking-[.12em] text-[#b8435f] transition hover:bg-[#fff0f3]"><WhatsAppIcon className="h-4 w-4"/> {isAr?'اطلب واتساب':'Order on WhatsApp'}</a>
+          </div>
+        </div>
+        <div className={`relative ${isAr?'md:order-1':'md:order-2'}`}>
+          <div className="mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-[32px] border-[3px] border-white bg-white shadow-[0_30px_80px_rgba(212,86,122,0.28)]"><img src={assets.hero} alt={isAr?'منتجات لمسة':'Lamssa products'} className="h-full w-full object-cover"/></div>
         </div>
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-px bg-white/20"/>
     </section>
 
     <section id="collections" className="py-16 md:py-24">
@@ -331,7 +334,7 @@ function Home(){
 
     <section className="overflow-hidden bg-[#fff0f3] text-[#3d2b30]">
       <div className="grid lg:grid-cols-2">
-        <div className="relative aspect-[4/5] min-h-[440px] w-full overflow-hidden lg:aspect-auto lg:min-h-[720px]"><img src={assets.brandPackaging} alt={isAr?'منتجات لمسة':'Lamssa products'} className="absolute inset-0 h-full w-full object-cover"/></div>
+        <div className="relative aspect-[4/5] min-h-[440px] w-full overflow-hidden bg-gradient-to-br from-[#fff0f3] to-[#fbe0e8] lg:aspect-auto lg:min-h-[720px]"><img src="/images/lamssa/products/bikini-care/01.png" alt={isAr?'منتجات لمسة':'Lamssa products'} className="absolute inset-0 h-full w-full object-contain p-8 md:p-14"/></div>
         <div className="flex items-center px-[18px] py-16 md:px-12 md:py-20 lg:px-20 lg:py-24 xl:px-24">
           <div className="w-full max-w-[680px]">
           <p className="mb-5 text-[10px] font-semibold uppercase tracking-[.3em] text-[#d4567a]">{isAr?'لمسة':'LAMSSA'}</p>
