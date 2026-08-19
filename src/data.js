@@ -24,21 +24,38 @@ export const FLAVORS = [
   { id:'chocolate', name:'Chocolate', arName:'شوكولاتة', hex:'#3d1e10', img:'/images/lamssa/products/edible-bikini/chocolate.png' },
 ]
 
-export const products = FLAVORS.map(f => ({
-  id:`edible-bikini-${f.id}`,
-  name:`EDIBLE BIKINI — ${f.name.toUpperCase()}`,
-  arName:`بكيني قابل للأكل — ${f.arName}`,
-  price:'AED 65',
-  aed:'DHS. 65.00',
-  priceAed:65,
-  img:f.img,
-  hover:f.img,
-  colorName:f.name,
-  desc:`${f.name}-flavored edible candy bikini — fun, playful, and sweet. For married couples only.`,
-  arDesc:`بكيني حلوى قابل للأكل بنكهة ${f.arName} — مرح وحلو ومميز. للمتزوجين فقط.`,
-  gallery:[f.img],
-  hasFlavors:false,
-  flavor:f,
-}))
+export const products = [
+  ...FLAVORS.map(f => ({
+    id:`edible-bikini-${f.id}`,
+    name:`EDIBLE BIKINI — ${f.name.toUpperCase()}`,
+    arName:`بكيني قابل للأكل — ${f.arName}`,
+    price:'AED 65',
+    aed:'DHS. 65.00',
+    priceAed:65,
+    img:f.img,
+    hover:f.img,
+    colorName:f.name,
+    desc:`${f.name}-flavored edible candy bikini — fun, playful, and sweet. For married couples only.`,
+    arDesc:`بكيني حلوى قابل للأكل بنكهة ${f.arName} — مرح وحلو ومميز. للمتزوجين فقط.`,
+    gallery:[f.img],
+    hasFlavors:false,
+    flavor:f,
+  })),
+  {
+    id:'femininity-care-package',
+    name:'FEMININITY CARE PACKAGE',
+    arName:'بكج الأنوثة للعناية بالمناطق الحساسة',
+    price:'AED 149',
+    aed:'DHS. 149.00',
+    priceAed:149,
+    img:'/images/lamssa/products/bikini-care/01.png',
+    hover:'/images/lamssa/products/bikini-care/01.png',
+    colorName:'Pink',
+    desc:'Complete bikini area care set — Beauty Girl wash & toner + soap. Brightening, moisturizing, 48h freshness.',
+    arDesc:'بكج كامل للعناية بالمناطق الحساسة — غسول وتونر + صابونة من بيوتي غيرل. تفتيح وترطيب وانتعاش ٤٨ ساعة.',
+    gallery:['/images/lamssa/products/bikini-care/01.png'],
+    hasFlavors:false,
+  },
+]
 
 export const blackProductGallery = products[0].gallery
