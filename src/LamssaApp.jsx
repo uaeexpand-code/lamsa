@@ -7,7 +7,7 @@ import { initPixels, trackEvent } from './analytics'
 
 const CartContext = createContext(null)
 const LanguageContext = createContext(null)
-const FREE_DELIVERY_AT = 500
+const FREE_DELIVERY_AT = 200
 const UAE_DELIVERY_FEE = 0
 const INSTAGRAM_URL = 'https://www.instagram.com/lamssa_ae/'
 const WHATSAPP_URL = 'https://wa.me/971567277289'
@@ -165,9 +165,13 @@ function Header(){
   </>
 }
 function CartDrawer(){
-  const { cart, cartOpen, setCartOpen, subtotal, total, updateQty, removeItem } = useCart()
+  const { cart, cartOpen, setCartOpen, subtotal, total, updateQty, removeItem, addToCart } = useCart()
   const { t, lang, isAr } = useLang()
   const { fmt } = useCurrency()
+  const remaining = Math.max(0, FREE_DELIVERY_AT - subtotal)
+  const pct = Math.min(100, Math.round((subtotal / FREE_DELIVERY_AT) * 100))
+  const bundle = products.find(p => p.id === 'femininity-care-package') || products.find(p => !cart.some(c => c.id === p.id)) || products[0]
+  const bundleInCart = cart.some(c => c.id === bundle?.id)
   return <AnimatePresence>
     {cartOpen && <>
       <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-[#d4567a]/45 backdrop-blur-[2px] z-50" onClick={()=>setCartOpen(false)} />
@@ -181,6 +185,10 @@ function CartDrawer(){
 
         <div className="flex-1 overflow-y-auto px-5 py-5 md:px-7">
           {cart.length === 0 ? <div className="h-full grid place-items-center text-center"><div className="rounded-[30px] border border-[#dedbd5] bg-white p-9 shadow-[0_22px_60px_rgba(17,17,17,0.06)]"><ShoppingBag className="mx-auto mb-4" size={42}/><p className="mb-2 uppercase tracking-[.16em]">{isAr?'السلة فارغة':'Your cart is empty'}</p><p className="mb-6 text-sm leading-6 text-[#706c67]">{isAr?'أضف منتج من لمسة لبدء الطلب.':'Add a Lamssa product to begin your order.'}</p><Link to="/collection/new-arrivals" onClick={()=>setCartOpen(false)} className="btn btn-black">{isAr?'تسوقي الجديد':'Shop new arrivals'}</Link></div></div> : <>
+            <div className="mb-5 rounded-[20px] border border-[#f0d4dc] bg-[#fff0f3] p-4">
+              <div className="mb-2.5 flex items-center gap-2 text-[12px] font-medium leading-5 text-[#3d2b30]"><Truck size={16} className="shrink-0 text-[#d4567a]"/>{remaining > 0 ? <span>{isAr?<>باقي <b className="text-[#d4567a]">{fmt(remaining)}</b> وتحصل على توصيل مجاني 🚚</>:<>You're <b className="text-[#d4567a]">{fmt(remaining)}</b> away from free delivery 🚚</>}</span> : <span className="font-semibold text-[#1a9e4b]">{isAr?'🎉 حصلت على توصيل مجاني!':'🎉 You unlocked free delivery!'}</span>}</div>
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-gradient-to-r from-[#f2a5b5] to-[#d4567a] transition-all duration-500" style={{width:`${pct}%`}}/></div>
+            </div>
             <div className="space-y-4">
               {cart.map(item => <div key={item.key} className="rounded-[26px] border border-[#dedbd5] bg-white p-3.5 shadow-[0_16px_42px_rgba(17,17,17,0.055)]">
                 <div className="grid grid-cols-[96px_1fr] gap-4">
@@ -197,6 +205,14 @@ function CartDrawer(){
                 </div>
               </div>)}
             </div>
+            {bundle && !bundleInCart && <div className="mt-5 rounded-[22px] border border-dashed border-[#d4567a]/40 bg-[#fff7f9] p-4">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.18em] text-[#d4567a]">{isAr?'أضيفي لطلبك 💗':'Complete your order 💗'}</p>
+              <div className="flex items-center gap-3">
+                <img src={bundle.img} className="h-[60px] w-[60px] shrink-0 rounded-[14px] border border-[#f0d4dc] bg-white object-contain"/>
+                <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold leading-4">{productName(bundle, lang)}</p><p className="mt-1 text-[13px] font-semibold text-[#d4567a]">{fmt(bundle.priceAed)}</p></div>
+                <button onClick={()=>addToCart({...bundle, image:bundle.img, priceAed:bundle.priceAed, color:bundle.colorName, qty:1})} className="shrink-0 rounded-full bg-[#d4567a] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.1em] text-white transition hover:bg-[#b8435f]">{isAr?'أضف':'Add'}</button>
+              </div>
+            </div>}
           </>}
         </div>
 
@@ -263,9 +279,9 @@ function Footer(){
   </footer>
 }
 function ProductCard({p, i=0}){
-  const { t, lang } = useLang()
+  const { t, lang, isAr } = useLang()
   const { fmt } = useCurrency()
-  return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className="product-card text-center relative group"><div className="relative"><Link to={`/product/${p.id}`} className="block relative bg-white overflow-hidden aspect-square rounded-[20px] border border-[#f0d4dc]"><img src={p.img} className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/><img src={p.hover} className="hover-img absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/></Link></div><h3 className="mt-5 mb-2 text-[13px] tracking-[.045em] font-medium uppercase leading-5"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3><p className="text-[11px] uppercase text-[#666]">{t('salePrice')}</p><p className="text-[13px] font-medium">{fmt(p.priceAed)}</p></motion.div>
+  return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className="product-card text-center relative group"><div className="relative"><Link to={`/product/${p.id}`} className="block relative bg-white overflow-hidden aspect-square rounded-[20px] border border-[#f0d4dc]">{p.badge && <span className="absolute left-3 top-3 z-10 rounded-full bg-[#d4567a] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.06em] text-white shadow-sm">{isAr?p.badge.ar:p.badge.en}</span>}<img src={p.img} className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/><img src={p.hover} className="hover-img absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/></Link></div><h3 className="mt-5 mb-2 text-[13px] tracking-[.045em] font-medium uppercase leading-5"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3><p className="text-[11px] uppercase text-[#666]">{t('salePrice')}</p><p className="text-[13px] font-medium flex items-center justify-center gap-2">{p.compareAtAed && <span className="text-[#b89ba2] line-through font-normal">{fmt(p.compareAtAed)}</span>}<span className={p.compareAtAed?'text-[#d4567a] font-semibold':''}>{fmt(p.priceAed)}</span></p></motion.div>
 }
 function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 md:gap-x-8">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
 const collectionPages = {
@@ -301,13 +317,13 @@ function Home(){
       <div className="absolute inset-x-0 bottom-0 h-px bg-white/20"/>
     </section>
 
-    <section id="collections" className="py-20 md:py-28">
+    <section id="collections" className="py-16 md:py-24">
       <div className="container-basic">
-        <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'تسوق حسب الفئة':'Shop by category'}</h2>
-          <p className="mt-5 max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'منتجات مميزة للمتزوجين بتوصيل سريع للإمارات والخليج.':'Premium products for married couples with fast UAE & Gulf delivery.'}</p>
+        <div className="mb-10 text-center md:mb-12">
+          <h2 className="font-display text-[36px] font-medium leading-none md:text-[52px]">{isAr?'تسوق حسب الفئة':'Shop by category'}</h2>
+          <p className="mt-4 mx-auto max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'منتجات مميزة للمتزوجين بتوصيل سريع للإمارات والخليج.':'Premium products for married couples with fast UAE & Gulf delivery.'}</p>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className="group relative min-h-[320px] overflow-hidden rounded-[20px] bg-white md:min-h-[460px]"><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"/><div className="absolute inset-0 bg-gradient-to-t from-[#d4567a]/75 via-[#d4567a]/10 to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className="text-2xl md:text-3xl font-display leading-tight">{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/85">{t('openCollection')}</p></div></Link>)}</div>
+        <div className="flex gap-6 md:gap-10 overflow-x-auto pb-4 justify-start md:justify-center snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{collections.map(([name,src])=><Link key={name} to={`/collection/${collectionSlug(name)}`} className="group flex shrink-0 snap-center flex-col items-center gap-3.5"><div className="relative h-[130px] w-[130px] md:h-[168px] md:w-[168px] overflow-hidden rounded-full border-[3px] border-[#f0d4dc] bg-white p-2 shadow-[0_12px_30px_rgba(212,86,122,0.12)] transition group-hover:border-[#d4567a] group-hover:shadow-[0_16px_40px_rgba(212,86,122,0.22)]"><img src={src} alt={collectionText(name, lang)} className="h-full w-full rounded-full object-cover transition duration-500 group-hover:scale-[1.06]"/></div><span className="text-[13px] md:text-[15px] font-semibold uppercase tracking-[.08em] text-[#3d2b30] group-hover:text-[#d4567a]">{collectionText(name, lang)}</span></Link>)}</div>
       </div>
     </section>
 
