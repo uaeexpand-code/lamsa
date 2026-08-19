@@ -1,4 +1,4 @@
-import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { Link, Route, Routes, useLocation, useParams, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Banknote, CheckCircle2, CreditCard, Heart, Minus, Plus, Search, Share2, ShoppingBag, Trash2, Truck, User, X } from 'lucide-react'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -497,6 +497,7 @@ function ProductPage(){
   const [main,setMain]=useState(gallery[0])
   const [qty,setQty]=useState(1)
   const [selectedFlavor,setSelectedFlavor]=useState(FLAVORS[0])
+  const navigate = useNavigate()
   const { addToCart } = useCart()
   const { t, lang, isAr } = useLang()
   const { fmt } = useCurrency()
@@ -567,9 +568,9 @@ function ProductPage(){
             </div>
 
             <div className="space-y-6">
-              {product.hasFlavors && <div>
-                <span className={optionLabel}>{isAr?'النكهة':'Flavor'}: <b className="text-[#181818]">{isAr ? selectedFlavor.arName : selectedFlavor.name}</b></span>
-                <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>{setSelectedFlavor(flavor); const idx = FLAVORS.findIndex(f=>f.id===flavor.id); goToImage(flavor.img, idx)}} aria-label={isAr?flavor.arName:flavor.name} className={`h-11 w-11 rounded-full border-2 transition ${selectedFlavor.id===flavor.id?'border-[#181818] ring-2 ring-[#181818] ring-offset-2':'border-[#e8e6e1] hover:border-[#999]'}`} style={{backgroundColor:flavor.hex}} />)}</div>
+              {product.flavor && <div>
+                <span className={optionLabel}>{isAr?'النكهة':'Flavor'}: <b className="text-[#181818]">{isAr ? product.flavor.arName : product.flavor.name}</b></span>
+                <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>navigate(`/product/edible-bikini-${flavor.id}`)} aria-label={isAr?flavor.arName:flavor.name} title={isAr?flavor.arName:flavor.name} className={`h-11 w-11 rounded-full border-2 transition ${product.flavor.id===flavor.id?'border-[#d4567a] ring-2 ring-[#d4567a] ring-offset-2':'border-[#e8e6e1] hover:border-[#d4567a]'}`} style={{backgroundColor:flavor.hex}} />)}</div>
               </div>}
               <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
             </div>
