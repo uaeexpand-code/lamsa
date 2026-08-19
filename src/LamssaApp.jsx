@@ -268,9 +268,9 @@ function ProductCard({p, i=0}){
 function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-14 max-w-3xl mx-auto">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
 const collectionPages = {
   'new-arrivals': { title:'LAMSSA New Arrivals', eyebrow:'Latest products', desc:'Explore the complete Lamssa product selection.', arEyebrow:'وصل حديثاً', arDesc:'اكتشف تشكيلة لمسة الحالية.', list:products },
-  'edible-flavors': { title:'Edible Flavors', eyebrow:'Edible body flavors', desc:'Sensual edible body gels and flavored products for couples.', arEyebrow:'نكهات قابلة للأكل', arDesc:'جل جسم ونكهات قابلة للأكل للمتزوجين.', list:products.filter(p => p.id.includes('edible-body-flavor') || p.id.includes('flavored-lip')) },
-  'novelty-lingerie': { title:'Novelty Lingerie', eyebrow:'Novelty sets', desc:'Playful lingerie and edible candy sets for special evenings.', arEyebrow:'لانجري مميز', arDesc:'لانجري مرح وبكيني حلوى لأمسيات مميزة.', list:products.filter(p => p.id.includes('bunny') || p.id.includes('bikini-candy')) },
-  'body-care': { title:'Body Care', eyebrow:'Bikini area care', desc:'Premium care products for sensitive areas.', arEyebrow:'العناية بالجسم', arDesc:'منتجات عناية فاخرة بالمناطق الحساسة.', list:products.filter(p => p.id.includes('care-kit')) },
+  'edible-flavors': { title:'Edible Flavors', eyebrow:'Edible flavors', desc:'Sweet edible products in six delicious flavors, for married couples.', arEyebrow:'نكهات قابلة للأكل', arDesc:'منتجات قابلة للأكل بست نكهات لذيذة، للمتزوجين.', list:products },
+  'novelty-lingerie': { title:'Novelty Lingerie', eyebrow:'Novelty sets', desc:'Playful edible candy bikinis for special evenings.', arEyebrow:'لانجري مميز', arDesc:'بكيني حلوى مرح لأمسيات مميزة.', list:products },
+  'body-care': { title:'Body Care', eyebrow:'Intimate care', desc:'Premium products for sensitive areas.', arEyebrow:'العناية بالجسم', arDesc:'منتجات فاخرة للمناطق الحساسة.', list:products },
 }
 const collectionSlug = (name) => name.includes('NEW') ? 'new-arrivals' : name.toLowerCase().replaceAll(' ','-')
 function Home(){
@@ -303,12 +303,14 @@ function Home(){
     <section id="collections" className="py-20 md:py-28">
       <div className="container-basic">
         <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'اكتشف منتجاتنا':'Explore our products'}</h2>
+          <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'تسوق حسب الفئة':'Shop by category'}</h2>
           <p className="mt-5 max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'منتجات مميزة للمتزوجين بتوصيل سريع للإمارات والخليج.':'Premium products for married couples with fast UAE & Gulf delivery.'}</p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 max-w-4xl">{products.map((p,index)=><Link key={p.id} to={`/product/${p.id}`} className="group relative overflow-hidden rounded-[24px] border border-[#f0d4dc] bg-white min-h-[420px] md:min-h-[520px] flex flex-col"><div className="relative flex-1 flex items-center justify-center p-8"><img src={p.img} alt={productName(p, lang)} className="max-h-[300px] w-auto object-contain transition duration-700 group-hover:scale-[1.04]"/></div><div className="border-t border-[#f0d4dc] bg-[#fdf7f8] p-5 md:p-7"><h3 className="text-lg md:text-2xl font-display leading-tight text-[#181818]">{productName(p, lang)}</h3><p className="mt-2 text-[15px] font-semibold text-[#d4567a]">{fmt(p.priceAed)}</p><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-[#8c6b74]">{isAr?'اطلب الآن':'Shop now'} →</p></div></Link>)}</div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className={`${index===0?'md:col-span-6':'md:col-span-2'} group relative min-h-[280px] overflow-hidden rounded-[20px] bg-[#fdf7f8] md:min-h-[440px]`}><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-contain p-6 transition duration-700 group-hover:scale-[1.05]"/><div className="absolute inset-0 bg-gradient-to-t from-[#d4567a]/70 via-transparent to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className={`${index===0?'text-2xl md:text-4xl':'text-base md:text-xl'} font-display leading-tight`}>{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/85">{t('openCollection')}</p></div></Link>)}</div>
       </div>
     </section>
+
+    <ProductGrid title={isAr?'منتجاتنا':'Our products'} list={products} />
 
     <section className="overflow-hidden bg-[#fff0f3] text-[#3d2b30]">
       <div className="grid lg:grid-cols-2">
