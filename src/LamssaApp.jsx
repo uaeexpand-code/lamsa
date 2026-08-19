@@ -323,12 +323,11 @@ function Home(){
       <div className={`absolute inset-0 ${isAr?'bg-gradient-to-l':'bg-gradient-to-r'} from-[#fbe4ec]/95 via-[#fbe4ec]/55 to-transparent md:from-[#fbe4ec]/90 md:via-[#fbe4ec]/35`}/>
       <div className="container-basic relative z-10 flex min-h-[560px] items-center py-16 md:min-h-[660px] md:py-20">
         <div className={`w-full max-w-xl text-center ${isAr?'md:mr-0 md:ml-auto md:text-right':'md:ml-0 md:mr-auto md:text-left'}`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[.3em] text-[#d4567a]">{isAr?'لمسة · ذوق يلامس الإحساس':'LAMSSA'}</p>
-          <h1 className={`font-display font-medium text-[#3d2b30] drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] ${isAr?'text-[44px] leading-[1.12] md:text-[76px]':'text-[46px] leading-[.95] tracking-[-.02em] md:text-[82px]'}`}>{isAr?'ذوق يلامس الإحساس':'Taste That Touches The Senses'}</h1>
-          <p className="mx-auto mt-6 max-w-md text-[15px] leading-8 text-[#6b545a] md:mx-0">{isAr?'منتجات حميمية مميزة للمتزوجين 💗 توصيل الإمارات خلال ٢٤ ساعة والخليج ٣-٤ أيام.':'Premium intimate products for married couples 💗 UAE delivery in 24h, Gulf in 3-4 days.'}</p>
-          <div className={`mt-8 flex flex-wrap items-center justify-center gap-3 ${isAr?'md:justify-end':'md:justify-start'}`}>
-            <Link to="/collection/edible-bikini" className="flex h-[54px] items-center justify-center rounded-full bg-[#d4567a] px-8 text-[13px] font-semibold uppercase tracking-[.14em] text-white shadow-lg transition hover:bg-[#b8435f]">{isAr?'تسوق الآن':'Shop now'}</Link>
-            <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-[54px] items-center justify-center gap-2 rounded-full border border-[#d4567a]/40 bg-white px-6 text-[13px] font-semibold uppercase tracking-[.12em] text-[#b8435f] transition hover:bg-[#fff0f3]"><WhatsAppIcon className="h-4 w-4"/> {isAr?'اطلب واتساب':'Order on WhatsApp'}</a>
+          <div className={`mb-6 inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 backdrop-blur-sm ${isAr?'flex-row-reverse':''}`}><span className="h-1.5 w-1.5 rounded-full bg-[#d4567a]"/><span className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#b8435f]">{isAr?'لمسة':'LAMSSA'}</span></div>
+          <h1 className={`font-display font-medium text-[#2b1a1f] ${isAr?'text-[46px] leading-[1.1] md:text-[80px]':'text-[52px] leading-[.92] tracking-[-.02em] md:text-[88px]'}`}>{isAr?'ذوق يلامس الإحساس':<>Taste That<br/>Touches The Senses</>}</h1>
+          <p className="mx-auto mt-6 max-w-md text-[15px] leading-8 text-[#6b545a] md:mx-0 md:text-[16px]">{isAr?'منتجات حميمية مميزة للمتزوجين — توصيل الإمارات خلال ٢٤ ساعة والخليج ٣-٤ أيام 💗':'Premium intimate products for married couples — delivered across the UAE in 24h, Gulf in 3–4 days 💗'}</p>
+          <div className={`mt-9 flex items-center justify-center ${isAr?'md:justify-end':'md:justify-start'}`}>
+            <Link to="/collection/edible-bikini" className="group inline-flex h-[56px] items-center justify-center gap-2.5 rounded-full bg-[#d4567a] px-9 text-[13px] font-semibold uppercase tracking-[.16em] text-white shadow-[0_12px_30px_rgba(212,86,122,0.35)] transition hover:bg-[#b8435f]">{isAr?'تسوقي الآن':'Shop now'}<span className={`transition group-hover:translate-x-1 ${isAr?'rotate-180':''}`}>→</span></Link>
           </div>
         </div>
       </div>
