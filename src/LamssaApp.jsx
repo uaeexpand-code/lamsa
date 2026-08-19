@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Banknote, CheckCircle2, CreditCard, Heart, Minus, Plus, Search, Share2, ShoppingBag, Trash2, Truck, User, X } from 'lucide-react'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { assets, blackProductGallery, collections, products, FLAVORS } from './data'
+import { initPixels, trackEvent } from './analytics'
 
 const CartContext = createContext(null)
 const LanguageContext = createContext(null)
@@ -43,6 +44,7 @@ function CartProvider({ children }) {
       if (found) return prev.map(x => x.key === item.key ? { ...x, qty: x.qty + item.qty } : x)
       return [...prev, item]
     })
+    trackEvent('AddToCart', { value: item.priceAed * item.qty, currency: 'AED', contents: [{ id: item.id, quantity: item.qty, price: item.priceAed }] })
     setCartOpen(true)
   }
 
@@ -477,6 +479,7 @@ function ProductPage(){
     })
     return () => cancelAnimationFrame(frame)
   }, [product.id, firstGalleryImage])
+  useEffect(()=>{ trackEvent('ViewContent', { value: product.priceAed, currency:'AED', contents:[{ id: product.id, quantity:1, price: product.priceAed }] }) }, [product.id, product.priceAed])
   const linePrice = product.priceAed
   const optionLabel = 'mb-3 block text-[11px] font-semibold uppercase tracking-[.18em] text-[#6f6b66]'
   const addLine = () => addToCart({...product, image:product.img, priceAed:linePrice, color:product.colorName, qty})
@@ -584,6 +587,7 @@ function Checkout(){
   const [form,setForm]=useState({ name:'', phone:'', country:isAr?'الإمارات العربية المتحدة':'United Arab Emirates', emirate:isAr?'دبي':'Dubai', address:'', area:'', notes:'' })
   const codFee = 0
   const grand = total + codFee
+  useEffect(()=>{ if(cart.length){ trackEvent('InitiateCheckout', { value: grand, currency:'AED', contents: cart.map(i=>({ id:i.id, quantity:i.qty, price:i.priceAed })) }) } }, [])
   const set = (k) => (e) => setForm(f => ({...f, [k]:e.target.value}))
   const field = 'h-[54px] w-full rounded-[16px] border border-[#f0d4dc] bg-white/85 px-4 text-[13px] outline-none transition focus:border-[#d4567a] focus:ring-4 focus:ring-[#fbe4ea] placeholder:text-[#b89ba2]'
   const label = 'mb-2 block text-[10px] font-semibold uppercase tracking-[.18em] text-[#8c6b74]'
@@ -626,6 +630,7 @@ function Checkout(){
     const msg = buildWhatsAppMessage(ref)
     const waNumber = '971567277289'
     window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank')
+    trackEvent('Purchase', { value: grand, currency:'AED', contents: cart.map(i=>({ id:i.id, quantity:i.qty, price:i.priceAed })) })
     setDone({ ref, total:grand, payment })
     clearCart()
   }
@@ -651,5 +656,5 @@ function ScrollReset(){
   return null
 }
 function Shell(){ const {pathname}=useLocation(); return <><Header/><CartDrawer/><AnimatePresence><motion.div key={pathname} initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:.28,ease:'easeOut'}}><ScrollReset/><Routes location={pathname}><Route path="/" element={<Home/>}/><Route path="/product/:id" element={<ProductPage/>}/><Route path="/collection/:slug" element={<CollectionPage/>}/><Route path="/checkout" element={<Checkout/>}/></Routes></motion.div></AnimatePresence><Footer/><FloatingWhatsApp/></> }
-function App(){ return <LanguageProvider><CurrencyProvider><CartProvider><Shell/></CartProvider></CurrencyProvider></LanguageProvider> }
+function App(){ useEffect(()=>{ initPixels() },[]); return <LanguageProvider><CurrencyProvider><CartProvider><Shell/></CartProvider></CurrencyProvider></LanguageProvider> }
 export default App
