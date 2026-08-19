@@ -275,6 +275,7 @@ const collectionPages = {
 const collectionSlug = (name) => name.includes('NEW') ? 'new-arrivals' : name.toLowerCase().replaceAll(' ','-')
 function Home(){
   const { t, lang, isAr } = useLang()
+  const { fmt } = useCurrency()
   const storyDetails = isAr ? [
     ['الإمارات','شحن من الإمارات لجميع دول الخليج.'],
     ['الجودة','منتجات حميمية فاخرة للمتزوجين.'],
@@ -305,11 +306,9 @@ function Home(){
           <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'اكتشف منتجاتنا':'Explore our products'}</h2>
           <p className="mt-5 max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'منتجات مميزة للمتزوجين بتوصيل سريع للإمارات والخليج.':'Premium products for married couples with fast UAE & Gulf delivery.'}</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className={`${index===0?'md:col-span-6':'md:col-span-2'} group relative min-h-[330px] overflow-hidden bg-[#efede9] md:min-h-[520px]`}><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"/><div className="absolute inset-0 bg-gradient-to-t from-[#111111]/75 via-transparent to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className={`${index===0?'text-2xl md:text-4xl':'text-base md:text-xl'} font-display leading-tight`}>{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/75">{t('openCollection')}</p></div></Link>)}</div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 max-w-4xl">{products.map((p,index)=><Link key={p.id} to={`/product/${p.id}`} className="group relative overflow-hidden rounded-[24px] border border-[#f0d4dc] bg-white min-h-[420px] md:min-h-[520px] flex flex-col"><div className="relative flex-1 flex items-center justify-center p-8"><img src={p.img} alt={productName(p, lang)} className="max-h-[300px] w-auto object-contain transition duration-700 group-hover:scale-[1.04]"/></div><div className="border-t border-[#f0d4dc] bg-[#fdf7f8] p-5 md:p-7"><h3 className="text-lg md:text-2xl font-display leading-tight text-[#181818]">{productName(p, lang)}</h3><p className="mt-2 text-[15px] font-semibold text-[#d4567a]">{fmt(p.priceAed)}</p><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-[#8c6b74]">{isAr?'اطلب الآن':'Shop now'} →</p></div></Link>)}</div>
       </div>
     </section>
-
-    <ProductGrid title="Lamssa new arrivals" actionPath="/collection/new-arrivals" />
 
     <section className="overflow-hidden bg-[#111111] text-[#f5f1e8]">
       <div className="grid lg:grid-cols-2">
