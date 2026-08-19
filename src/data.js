@@ -10,16 +10,17 @@ export const assets = {
 
 export const collections = [
   ['NEW ARRIVALS','/images/lamssa/products/edible-bikini/strawberry.png'],
-  ['EDIBLE FLAVORS','/images/lamssa/products/edible-bikini/tropical.png'],
-  ['NOVELTY LINGERIE','/images/lamssa/products/edible-bikini/berry.png'],
+  ['EDIBLE FLAVORS','/images/lamssa/products/edible-bikini/mango.png'],
+  ['NOVELTY LINGERIE','/images/lamssa/products/edible-bikini/grape.png'],
   ['BODY CARE','/images/lamssa/products/edible-bikini/pineapple.png'],
 ]
 
 export const FLAVORS = [
   { id:'strawberry', name:'Strawberry', arName:'فراولة', hex:'#e63946', img:'/images/lamssa/products/edible-bikini/strawberry.png' },
-  { id:'tropical', name:'Tropical Mango', arName:'مانجو استوائي', hex:'#f4a020', img:'/images/lamssa/products/edible-bikini/tropical.png' },
+  { id:'cherry', name:'Cherry', arName:'كرز', hex:'#c1121f', img:'/images/lamssa/products/edible-bikini/cherry.png' },
+  { id:'mango', name:'Mango', arName:'مانجو', hex:'#f4a020', img:'/images/lamssa/products/edible-bikini/mango.png' },
   { id:'pineapple', name:'Pineapple', arName:'أناناس', hex:'#f4c542', img:'/images/lamssa/products/edible-bikini/pineapple.png' },
-  { id:'berry', name:'Berry', arName:'توت', hex:'#7b2d8b', img:'/images/lamssa/products/edible-bikini/berry.png' },
+  { id:'grape', name:'Grape', arName:'عنب', hex:'#7b2d8b', img:'/images/lamssa/products/edible-bikini/grape.png' },
   { id:'chocolate', name:'Chocolate', arName:'شوكولاتة', hex:'#3d1e10', img:'/images/lamssa/products/edible-bikini/chocolate.png' },
 ]
 
@@ -32,27 +33,12 @@ export const products = [
     aed:'DHS. 65.00',
     priceAed:65,
     img:'/images/lamssa/products/edible-bikini/strawberry.png',
-    hover:'/images/lamssa/products/edible-bikini/tropical.png',
+    hover:'/images/lamssa/products/edible-bikini/mango.png',
     colorName:'Strawberry',
-    desc:'Edible candy bikini — fun, playful, and sweet. Available in 5 flavors. For married couples only.',
-    arDesc:'بكيني حلوى قابل للأكل — مرح وحلو ومميز. متوفر بـ 5 نكهات. للمتزوجين فقط.',
+    desc:'Edible candy bikini — fun, playful, and sweet. Available in 6 flavors. For married couples only.',
+    arDesc:'بكيني حلوى قابل للأكل — مرح وحلو ومميز. متوفر بـ 6 نكهات. للمتزوجين فقط.',
     gallery: FLAVORS.map(f => f.img),
     hasFlavors: true,
-  },
-  {
-    id:'bikini-care-package',
-    name:'FEMININITY CARE PACKAGE',
-    arName:'بكج الأنوثة للعناية بالمناطق الحساسة',
-    price:'AED 149',
-    aed:'DHS. 149.00',
-    priceAed:149,
-    img:'/images/lamssa/products/bikini-care/01.png',
-    hover:'/images/lamssa/products/bikini-care/01.png',
-    colorName:'Pink',
-    desc:'Complete bikini area care set — Beauty Girl wash & toner + soap. Brightening, moisturizing, 48h freshness.',
-    arDesc:'بكج كامل للعناية بالمناطق الحساسة — غسول وتونر + صابونة. تفتيح وترطيب وانتعاش ٤٨ ساعة.',
-    gallery: ['/images/lamssa/products/bikini-care/01.png'],
-    hasFlavors: false,
   },
 ]
 
