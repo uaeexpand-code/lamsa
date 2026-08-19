@@ -265,7 +265,7 @@ function ProductCard({p, i=0}){
   const { fmt } = useCurrency()
   return <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.4,delay:i*0.06,ease:'easeOut'}} className="product-card text-center relative group"><div className="relative"><Link to={`/product/${p.id}`} className="block relative bg-white overflow-hidden aspect-square rounded-[20px] border border-[#f0d4dc]"><img src={p.img} className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/><img src={p.hover} className="hover-img absolute inset-0 w-3/4 h-3/4 m-auto object-contain transition duration-300"/></Link></div><h3 className="mt-5 mb-2 text-[13px] tracking-[.045em] font-medium uppercase leading-5"><Link to={`/product/${p.id}`}>{productName(p, lang)}</Link></h3><p className="text-[11px] uppercase text-[#666]">{t('salePrice')}</p><p className="text-[13px] font-medium">{fmt(p.priceAed)}</p></motion.div>
 }
-function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-14 max-w-3xl mx-auto">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
+function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 md:gap-x-8">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
 const collectionPages = {
   'new-arrivals': { title:'LAMSSA New Arrivals', eyebrow:'Latest products', desc:'Explore the complete Lamssa product selection.', arEyebrow:'وصل حديثاً', arDesc:'اكتشف تشكيلة لمسة الحالية.', list:products },
   'edible-flavors': { title:'Edible Flavors', eyebrow:'Edible flavors', desc:'Sweet edible products in six delicious flavors, for married couples.', arEyebrow:'نكهات قابلة للأكل', arDesc:'منتجات قابلة للأكل بست نكهات لذيذة، للمتزوجين.', list:products },
@@ -496,7 +496,7 @@ function ProductPage(){
   }, [product.id, firstGalleryImage])
   const linePrice = product.priceAed
   const optionLabel = 'mb-3 block text-[11px] font-semibold uppercase tracking-[.18em] text-[#6f6b66]'
-  const addLine = () => addToCart({...product, image:selectedFlavor.img, priceAed:linePrice, color:selectedFlavor.name, qty})
+  const addLine = () => addToCart({...product, image:product.img, priceAed:linePrice, color:product.colorName, qty})
   const goToImage = (src, index) => {
     setMain(src)
     const carousel = galleryRef.current

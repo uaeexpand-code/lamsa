@@ -24,22 +24,21 @@ export const FLAVORS = [
   { id:'chocolate', name:'Chocolate', arName:'شوكولاتة', hex:'#3d1e10', img:'/images/lamssa/products/edible-bikini/chocolate.png' },
 ]
 
-export const products = [
-  {
-    id:'edible-bikini',
-    name:'EDIBLE BIKINI',
-    arName:'بكيني قابل للأكل',
-    price:'AED 65',
-    aed:'DHS. 65.00',
-    priceAed:65,
-    img:'/images/lamssa/products/edible-bikini/strawberry.png',
-    hover:'/images/lamssa/products/edible-bikini/mango.png',
-    colorName:'Strawberry',
-    desc:'Edible candy bikini — fun, playful, and sweet. Available in 6 flavors. For married couples only.',
-    arDesc:'بكيني حلوى قابل للأكل — مرح وحلو ومميز. متوفر بـ 6 نكهات. للمتزوجين فقط.',
-    gallery: FLAVORS.map(f => f.img),
-    hasFlavors: true,
-  },
-]
+export const products = FLAVORS.map(f => ({
+  id:`edible-bikini-${f.id}`,
+  name:`EDIBLE BIKINI — ${f.name.toUpperCase()}`,
+  arName:`بكيني قابل للأكل — ${f.arName}`,
+  price:'AED 65',
+  aed:'DHS. 65.00',
+  priceAed:65,
+  img:f.img,
+  hover:f.img,
+  colorName:f.name,
+  desc:`${f.name}-flavored edible candy bikini — fun, playful, and sweet. For married couples only.`,
+  arDesc:`بكيني حلوى قابل للأكل بنكهة ${f.arName} — مرح وحلو ومميز. للمتزوجين فقط.`,
+  gallery:[f.img],
+  hasFlavors:false,
+  flavor:f,
+}))
 
 export const blackProductGallery = products[0].gallery
