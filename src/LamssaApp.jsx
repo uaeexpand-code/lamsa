@@ -186,7 +186,7 @@ function CartDrawer(){
         <div className="flex-1 overflow-y-auto px-5 py-5 md:px-7">
           {cart.length === 0 ? <div className="h-full grid place-items-center text-center"><div className="rounded-[30px] border border-[#dedbd5] bg-white p-9 shadow-[0_22px_60px_rgba(17,17,17,0.06)]"><ShoppingBag className="mx-auto mb-4" size={42}/><p className="mb-2 uppercase tracking-[.16em]">{isAr?'السلة فارغة':'Your cart is empty'}</p><p className="mb-6 text-sm leading-6 text-[#706c67]">{isAr?'أضف منتج من لمسة لبدء الطلب.':'Add a Lamssa product to begin your order.'}</p><Link to="/collection/new-arrivals" onClick={()=>setCartOpen(false)} className="btn btn-black">{isAr?'تسوقي الجديد':'Shop new arrivals'}</Link></div></div> : <>
             <div className="mb-5 rounded-[20px] border border-[#f0d4dc] bg-[#fff0f3] p-4">
-              <div className="mb-2.5 flex items-center gap-2 text-[12px] font-medium leading-5 text-[#3d2b30]"><Truck size={16} className="shrink-0 text-[#d4567a]"/>{remaining > 0 ? <span>{isAr?<>باقي <b className="text-[#d4567a]">{fmt(remaining)}</b> وتحصل على توصيل مجاني 🚚</>:<>You're <b className="text-[#d4567a]">{fmt(remaining)}</b> away from free delivery 🚚</>}</span> : <span className="font-semibold text-[#1a9e4b]">{isAr?'🎉 حصلت على توصيل مجاني!':'🎉 You unlocked free delivery!'}</span>}</div>
+              <div className="mb-2.5 flex items-center gap-2 text-[12px] font-medium leading-5 text-[#3d2b30]"><Truck size={16} className="shrink-0 text-[#d4567a]"/>{remaining > 0 ? <span>{isAr?<>أضف بـ <b className="text-[#d4567a]">{fmt(remaining)}</b> واحصل على توصيل مجاني 🚚</>:<>Add <b className="text-[#d4567a]">{fmt(remaining)}</b> more to get free delivery 🚚</>}</span> : <span className="font-semibold text-[#1a9e4b]">{isAr?'🎉 توصيلك مجاني!':'🎉 You got free delivery!'}</span>}</div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-gradient-to-r from-[#f2a5b5] to-[#d4567a] transition-all duration-500" style={{width:`${pct}%`}}/></div>
             </div>
             <div className="space-y-4">
@@ -499,6 +499,13 @@ function ProductPage(){
   const linePrice = product.priceAed
   const optionLabel = 'mb-3 block text-[11px] font-semibold uppercase tracking-[.18em] text-[#6f6b66]'
   const addLine = () => addToCart({...product, image:product.img, priceAed:linePrice, color:product.colorName, qty})
+  // Smart cross-sell: on a single flavor → offer the All-6 bundle; on bundle/care → offer the other one.
+  const bundleProduct = products.find(p => p.id === 'edible-bikini-bundle')
+  const careProduct = products.find(p => p.id === 'femininity-care-package')
+  const isSingleFlavor = product.id.startsWith('edible-bikini-') && product.id !== 'edible-bikini-bundle'
+  const crossSell = isSingleFlavor ? bundleProduct : (product.id === 'edible-bikini-bundle' ? careProduct : bundleProduct)
+  const pairTotal = crossSell ? linePrice + crossSell.priceAed : 0
+  const addBoth = () => { addLine(); if(crossSell) addToCart({...crossSell, image:crossSell.img, priceAed:crossSell.priceAed, color:crossSell.colorName, qty:1}) }
   const goToImage = (src, index) => {
     setMain(src)
     const carousel = galleryRef.current
@@ -558,6 +565,16 @@ function ProductPage(){
 
             <div className="mt-5 grid gap-3 md:grid-cols-[124px_1fr]"><div className="flex h-[52px] overflow-hidden rounded-full border border-[#dedbd5]"><button onClick={()=>setQty(Math.max(1,qty-1))} className="flex-1"><Minus size={15} className="mx-auto"/></button><span className="grid flex-1 place-items-center text-sm">{qty}</span><button onClick={()=>setQty(qty+1)} className="flex-1"><Plus size={15} className="mx-auto"/></button></div><button onClick={addLine} className="h-[52px] rounded-full bg-[#d4567a] px-6 text-[13px] font-semibold uppercase tracking-[.14em] text-white">{t('addToCart')} · {fmt(linePrice * qty)}</button></div>
             <Link to="/checkout" onClick={addLine} className="mt-3 flex h-[52px] items-center justify-center rounded-full border border-[#1a1a1a] bg-white text-[13px] font-semibold uppercase tracking-[.14em]">{t('buyNow')}</Link>
+            {crossSell && <div className="mt-6 rounded-[20px] border border-[#f0d4dc] bg-[#fff7f9] p-4">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.18em] text-[#d4567a]">{isAr?'يُشترى معه عادةً 💗':'Frequently bought together 💗'}</p>
+              <div className="flex items-center gap-2">
+                <div className="grid h-[64px] w-[64px] shrink-0 place-items-center rounded-[14px] border border-[#f0d4dc] bg-white"><img src={product.img} className="h-[52px] w-[52px] object-contain"/></div>
+                <Plus size={16} className="shrink-0 text-[#b89ba2]"/>
+                <Link to={`/product/${crossSell.id}`} className="grid h-[64px] w-[64px] shrink-0 place-items-center rounded-[14px] border border-[#f0d4dc] bg-white"><img src={crossSell.img} className="h-[52px] w-[52px] object-contain"/></Link>
+                <div className="min-w-0 flex-1 ps-1"><p className="text-[11px] leading-4 text-[#6b545a]">{isAr?'أضف':'Add'} <Link to={`/product/${crossSell.id}`} className="font-semibold text-[#3d2b30] underline decoration-[#f0d4dc]">{productName(crossSell, lang)}</Link></p><p className="mt-1 text-[13px] font-semibold text-[#181818]">{isAr?'المجموع':'Total'}: {fmt(pairTotal)}</p></div>
+              </div>
+              <button onClick={addBoth} className="mt-3 flex h-[46px] w-full items-center justify-center gap-2 rounded-full bg-[#d4567a] text-[12px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-[#b8435f]"><Plus size={15}/> {isAr?'أضف الاثنين للسلة':'Add both to cart'}</button>
+            </div>}
           </div>
         </aside>
       </div>
