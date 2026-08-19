@@ -143,7 +143,7 @@ function Header(){
   const iconClass = 'w-[18px] h-[18px] md:w-[19px] md:h-[19px]'
   const iconButton = 'grid place-items-center w-9 h-9 rounded-full border border-[#dedbd5] bg-white/55 hover:bg-[#d4567a] hover:text-white hover:border-[#1a1a1a] transition'
   return <>
-    <div className="w-full max-w-full overflow-hidden h-[30px] bg-[#d4567a] flex items-center justify-center text-center text-[9px] md:text-[11px] tracking-[.18em] uppercase px-3 text-[#f5f1e8]">{t('promo')}</div>
+    <div className="w-full max-w-full overflow-hidden h-[30px] bg-[#fff0f3] flex items-center justify-center text-center text-[9px] md:text-[11px] tracking-[.18em] uppercase px-3 text-[#b8435f] border-b border-[#f0d4dc]">{t('promo')}</div>
     <header className="w-full max-w-full overflow-hidden h-[76px] md:h-[104px] border-b border-[#dedbd5] bg-[#ffffff]/95 relative z-10 shadow-[0_12px_35px_rgba(17,17,17,0.045)]">
       <div className="container-basic h-full grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-8 min-w-0">
         <nav className="desktop-nav flex items-center gap-8 text-[11px] tracking-[.16em] uppercase text-[#202020]"><Link className="nav-luxe" to="/">{t('shop')}</Link><Link className="nav-luxe" to="/collection/new-arrivals">{t('new')}</Link><Link className="nav-luxe" to="/#collections">{t('collections')}</Link><Link className="nav-luxe" to="/collection/edible-flavors">{isAr?'نكهات':'Flavors'}</Link></nav>
@@ -236,25 +236,25 @@ function Footer(){
   const quick=isAr?['عن لمسة','تواصل','التوصيل والاسترجاع','الخصوصية','الشروط','العروض']:['About','Contact','Delivery & Returns','Privacy','Terms','Offers'];
   return <footer className="footer-bg mt-16 md:mt-20">
     <div className="mx-auto max-w-[1440px] md:px-8 md:py-10">
-      <div className="overflow-hidden border-y border-white/10 bg-[#d4567a] text-[#f3f1e9] shadow-[0_28px_80px_rgba(17,17,17,0.16)] md:rounded-[34px] md:border">
+      <div className="overflow-hidden border-y border-[#f0d4dc] bg-[#fff0f3] text-[#6b545a] shadow-[0_28px_80px_rgba(212,86,122,0.12)] md:rounded-[34px] md:border">
         <div className="px-6 py-12 md:px-10 md:py-12 lg:px-12">
           <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr_1.1fr] lg:gap-14">
             <div className={isAr?'text-right':'text-left'}>
-              <div className="mb-5 flex justify-start"><BrandLogo light /></div>
-              <p className="max-w-[340px] text-[14px] leading-7 text-[#d1cec8]">{isAr?'ذوق يلامس الإحساس 💗 توصيل الإمارات خلال 24 ساعة والخليج خلال 3-4 أيام.':'Taste that touches the senses 💗 UAE delivery within 24 hours, Gulf within 3-4 days.'}</p>
-              <div className="mt-6 flex flex-wrap gap-3"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[.06] px-5 text-[13px] transition hover:bg-white/12"><InstagramIcon className="h-4 w-4"/> {isAr?'إنستغرام':'Instagram'}</a><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[.06] px-5 text-[13px] transition hover:bg-white/12"><WhatsAppIcon className="h-4 w-4"/> {isAr?'واتساب':'WhatsApp'}</a></div>
+              <div className="mb-5 flex justify-start"><BrandLogo /></div>
+              <p className="max-w-[340px] text-[14px] leading-7 text-[#6b545a]">{isAr?'ذوق يلامس الإحساس 💗 توصيل الإمارات خلال 24 ساعة والخليج خلال 3-4 أيام.':'Taste that touches the senses 💗 UAE delivery within 24 hours, Gulf within 3-4 days.'}</p>
+              <div className="mt-6 flex flex-wrap gap-3"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-[#f0d4dc] bg-white px-5 text-[13px] text-[#b8435f] transition hover:bg-[#d4567a] hover:text-white"><InstagramIcon className="h-4 w-4"/> {isAr?'إنستغرام':'Instagram'}</a><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-2 rounded-full border border-[#f0d4dc] bg-white px-5 text-[13px] text-[#b8435f] transition hover:bg-[#d4567a] hover:text-white"><WhatsAppIcon className="h-4 w-4"/> {isAr?'واتساب':'WhatsApp'}</a></div>
             </div>
-            <div className="grid grid-cols-2 gap-8 border-t border-white/15 pt-8 text-[13px] text-[#d1cec8] lg:border-t-0 lg:pt-0">
-              <div><h4 className="mb-5 text-[12px] font-semibold text-white">{isAr?'تسوقي':'Shop'}</h4><div className="grid gap-3">{shop.map(x=><Link key={x} to="/" className="transition hover:text-white">{x}</Link>)}</div></div>
-              <div><h4 className="mb-5 text-[12px] font-semibold text-white">{isAr?'الدعم':'Support'}</h4><div className="grid gap-3">{quick.map(x=><Link key={x} to="/" className="transition hover:text-white">{x}</Link>)}</div></div>
+            <div className="grid grid-cols-2 gap-8 border-t border-[#f0d4dc] pt-8 text-[13px] text-[#6b545a] lg:border-t-0 lg:pt-0">
+              <div><h4 className="mb-5 text-[12px] font-semibold text-[#b8435f]">{isAr?'تسوقي':'Shop'}</h4><div className="grid gap-3">{shop.map(x=><Link key={x} to="/" className="transition hover:text-[#d4567a]">{x}</Link>)}</div></div>
+              <div><h4 className="mb-5 text-[12px] font-semibold text-[#b8435f]">{isAr?'الدعم':'Support'}</h4><div className="grid gap-3">{quick.map(x=><Link key={x} to="/" className="transition hover:text-[#d4567a]">{x}</Link>)}</div></div>
             </div>
-            <div className="border-t border-white/15 pt-8 lg:border-t-0 lg:pt-0">
-              <h4 className="text-[16px] font-medium text-white">{isAr?'كوني أول من يعرف':'Be first to know'}</h4>
-              <p className="mt-2 max-w-sm text-[12px] leading-6 text-[#c8c5bf]">{isAr?'وصل حديثاً وعروض لمسة، مباشرة إلى بريدك.':'New arrivals and Lamssa offers, sent directly to your inbox.'}</p>
-              <div className="mt-5 flex h-12 max-w-md overflow-hidden rounded-full border border-white/20 bg-white/[.08] focus-within:border-white/45"><input className="min-w-0 flex-1 bg-transparent px-5 text-[12px] text-white outline-none placeholder:text-[#b8b5af]" placeholder={isAr?'بريدك الإلكتروني':'Your email'}/><button className="shrink-0 bg-[#f1eee4] px-6 text-[11px] font-semibold text-[#111111] transition hover:bg-white">{isAr?'انضمي':'Join'}</button></div>
+            <div className="border-t border-[#f0d4dc] pt-8 lg:border-t-0 lg:pt-0">
+              <h4 className="text-[16px] font-medium text-[#b8435f]">{isAr?'كوني أول من يعرف':'Be first to know'}</h4>
+              <p className="mt-2 max-w-sm text-[12px] leading-6 text-[#6b545a]">{isAr?'وصل حديثاً وعروض لمسة، مباشرة إلى بريدك.':'New arrivals and Lamssa offers, sent directly to your inbox.'}</p>
+              <div className="mt-5 flex h-12 max-w-md overflow-hidden rounded-full border border-[#f0d4dc] bg-white focus-within:border-[#d4567a]"><input className="min-w-0 flex-1 bg-transparent px-5 text-[12px] text-[#3d2b30] outline-none placeholder:text-[#b89ba2]" placeholder={isAr?'بريدك الإلكتروني':'Your email'}/><button className="shrink-0 bg-[#d4567a] px-6 text-[11px] font-semibold text-white transition hover:bg-[#b8435f]">{isAr?'انضمي':'Join'}</button></div>
             </div>
           </div>
-          <div className="mt-10 flex flex-col gap-3 border-t border-white/15 pt-6 text-[11px] text-[#b8b5af] md:flex-row md:items-center md:justify-between"><span>{t('footerLang')} ⌄</span><span>{isAr?'© ٢٠٢٦ لمسة':'© 2026 LAMSSA'}</span><span>{isAr?'أبل باي، تابي، تمارا، الدفع عند الاستلام':'Apple Pay, Tabby, Tamara, COD'}</span></div>
+          <div className="mt-10 flex flex-col gap-3 border-t border-[#f0d4dc] pt-6 text-[11px] text-[#8c6b74] md:flex-row md:items-center md:justify-between"><span>{t('footerLang')} ⌄</span><span>{isAr?'© ٢٠٢٦ لمسة':'© 2026 LAMSSA'}</span><span>{isAr?'أبل باي، تابي، تمارا، الدفع عند الاستلام':'Apple Pay, Tabby, Tamara, COD'}</span></div>
         </div>
       </div>
     </div>
@@ -310,15 +310,15 @@ function Home(){
       </div>
     </section>
 
-    <section className="overflow-hidden bg-[#d4567a] text-[#f5f1e8]">
+    <section className="overflow-hidden bg-[#fff0f3] text-[#3d2b30]">
       <div className="grid lg:grid-cols-2">
         <div className="relative aspect-[4/5] min-h-[440px] w-full overflow-hidden lg:aspect-auto lg:min-h-[720px]"><img src={assets.brandPackaging} alt={isAr?'منتجات لمسة':'Lamssa products'} className="absolute inset-0 h-full w-full object-cover"/></div>
         <div className="flex items-center px-[18px] py-16 md:px-12 md:py-20 lg:px-20 lg:py-24 xl:px-24">
           <div className="w-full max-w-[680px]">
-          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[.3em] text-[#c8c5bf]">{isAr?'لمسة':'LAMSSA'}</p>
-          <h2 className="max-w-[12ch] font-display text-[48px] font-medium leading-[.94] md:text-[68px]">{isAr?'للمتزوجين فقط':'For married couples only'}</h2>
-          <p className={`mt-7 max-w-[280px] text-sm leading-8 text-[#dedbd5] md:max-w-xl ${isAr?'ml-auto md:ml-0':'mr-auto'}`}>{isAr?'منتجات حميمية مختارة بعناية لإضافة لمسة مميزة لحياتكم.':'Carefully curated intimate products to add a special touch to your life together.'}</p>
-          <div className="mt-10 grid gap-7 border-t border-white/20 pt-8 sm:grid-cols-3 sm:gap-5">{storyDetails.map(([title,body])=><div key={title}><h3 className="font-display text-2xl text-[#f5f1e8]">{title}</h3><p className="mt-2 text-xs leading-6 text-[#c8c5bf]">{body}</p></div>)}</div>
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[.3em] text-[#d4567a]">{isAr?'لمسة':'LAMSSA'}</p>
+          <h2 className="max-w-[12ch] font-display text-[48px] font-medium leading-[.94] md:text-[68px] text-[#b8435f]">{isAr?'للمتزوجين فقط':'For married couples only'}</h2>
+          <p className={`mt-7 max-w-[280px] text-sm leading-8 text-[#6b545a] md:max-w-xl ${isAr?'ml-auto md:ml-0':'mr-auto'}`}>{isAr?'منتجات حميمية مختارة بعناية لإضافة لمسة مميزة لحياتكم.':'Carefully curated intimate products to add a special touch to your life together.'}</p>
+          <div className="mt-10 grid gap-7 border-t border-[#f0d4dc] pt-8 sm:grid-cols-3 sm:gap-5">{storyDetails.map(([title,body])=><div key={title}><h3 className="font-display text-2xl text-[#b8435f]">{title}</h3><p className="mt-2 text-xs leading-6 text-[#6b545a]">{body}</p></div>)}</div>
           </div>
         </div>
       </div>
