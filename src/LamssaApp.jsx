@@ -329,40 +329,17 @@ function Home(){
 }
 function CollectionPage(){ const { slug } = useParams(); const { lang, isAr, t } = useLang(); const collection = collectionPages[slug] || collectionPages['new-arrivals']; return <main className="bg-[#ffffff]"><section className="border-b border-[#dedbd5] py-14 md:py-20"><div className="container-basic text-center"><div className="mb-5 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[.18em] text-[#706c67]"><Link to="/" className="hover:text-[#181818]">{t('home')}</Link><span>/</span><span className="text-[#181818]">{collectionText(collection.title, lang)}</span></div><p className="mb-4 text-[11px] uppercase tracking-[.28em] text-[#55514d]">{isAr?collection.arEyebrow:collection.eyebrow}</p><h1 className="text-[30px] md:text-[48px] font-medium uppercase tracking-[.1em]">{collectionText(collection.title, lang)}</h1><p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-[#706c67]">{isAr?collection.arDesc:collection.desc}</p></div></section><ProductGrid title={`${collection.list.length} ${t('pieces')}`} list={collection.list}/></main> }
 const CUSTOMER_REVIEWS = [
-  { type:'image', src:'/images/lamssa/reviews/review-01.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-02.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-03.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-04.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-05.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-06.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-07.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-08.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-09.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-10.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-11.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-12.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-13.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-14.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-15.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-16.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-17.webp' },
-  { type:'video', src:'/images/lamssa/reviews/review-18.mp4', poster:'/images/lamssa/reviews/review-18-poster.webp' },
-  { type:'image', src:'/images/lamssa/reviews/review-19.webp' },
-  { type:'video', src:'/images/lamssa/reviews/review-20.mp4', poster:'/images/lamssa/reviews/review-20-poster.webp' },
+  { name:'أم راشد', city:'دبي', stars:5, text:'والله شي يجنن 😍 وصلني بسرعة نفس اليوم وكله ديسكريت بالتوصيل، ما أحد درى شو الطلب. بطلب باقي النكهات!' },
+  { name:'موزة', city:'أبوظبي', stars:5, text:'خذيته هدية لزوجي وصراحة كسر الروتين 🔥 الجودة حلوة والريحة طيبة. أنصح فيه بقوة حبيباتي.' },
+  { name:'Shaikha', city:'Sharjah', stars:5, text:'Ordered before 9pm and got it next day 🙌 super discreet packaging, exactly like the pics. 10/10 will reorder.' },
+  { name:'أم خليفة', city:'العين', stars:5, text:'بصراحة كنت مترددة بس طلعت أحلى من توقعي 💕 التوصيل سريع والتعامل رهيب عبر الواتساب.' },
+  { name:'Noora', city:'Dubai', stars:5, text:'The strawberry one is the best 🍓 fast delivery and no one knew what was inside. Highly recommend for couples!' },
+  { name:'حصة', city:'رأس الخيمة', stars:5, text:'شي وايد حلو وسعره مناسب 😋 وصل بيومين للرأس، والتغليف محترم ومحد يعرف شو فيه. مشكورين لمسة.' },
+  { name:'أم سلطان', city:'عجمان', stars:5, text:'زوجي انبسط وايد 😂❤️ الطلب سهل والدفع عند الاستلام ريحني. بطلب النكهة الجديدة أكيد.' },
+  { name:'Latifa', city:'Abu Dhabi', stars:5, text:'جربت الشوكولاته وايد لذيذة 🍫 خدمة راقية وردهم سريع عالواتساب. تسلم إيدكم.' },
 ]
-function ReviewVideo({review,label}){
-  const videoRef = useRef(null)
-  useEffect(()=>{
-    const video = videoRef.current
-    if(!video) return
-    const observer = new IntersectionObserver(([entry])=>{
-      if(entry.isIntersecting) video.play().catch(()=>{})
-      else video.pause()
-    },{threshold:.15})
-    observer.observe(video)
-    return ()=>observer.disconnect()
-  },[])
-  return <video ref={videoRef} src={review.src} poster={review.poster} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture aria-label={label} className="h-full w-full object-cover"/>
+function Stars({ n=5 }){
+  return <div className="flex gap-0.5 text-[#f4b400]">{Array.from({length:5}).map((_,i)=><svg key={i} viewBox="0 0 20 20" className="h-4 w-4" fill={i<n?'currentColor':'#e8ddd0'}><path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 15l-5.3 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg>)}</div>
 }
 function CustomerMoments(){
   const { isAr } = useLang()
@@ -451,13 +428,20 @@ function CustomerMoments(){
       viewport.removeEventListener('keydown',onIntent)
     }
   },[isAr])
-  const group = (duplicate=false) => <div aria-hidden={duplicate || undefined} className="flex shrink-0 gap-5 pr-5">{CUSTOMER_REVIEWS.map((review,index)=><article key={review.src} dir={isAr?'rtl':'ltr'} className="w-[270px] shrink-0 overflow-hidden rounded-[28px] border border-[#dedbd5] bg-[#ffffff] md:w-[310px]">
-    <div className="aspect-[5/7] overflow-hidden bg-[#e8e6e1]">{review.type==='video'?<ReviewVideo review={duplicate?{...review,src:`${review.src}?marquee-copy=1`}:review} label={`${isAr?'فيديو تجربة عميل لمسة':'Lamssa customer review video'} ${index+1}`}/>:<img src={review.src} alt={`${isAr?'تجربة عميل لمسة':'Lamssa customer review'} ${index+1}`} loading="lazy" decoding="async" className="h-full w-full object-cover"/>}</div>
-    <div className="p-5 text-center"><h3 className="font-display text-[26px] leading-none text-[#202020]">{isAr?'تجربة عميل لمسة':'Lamssa customer review'}</h3><p className="mt-3 text-[10px] font-semibold uppercase tracking-[.2em] text-[#706c67]">{isAr?'لمسة':'LAMSSA'}</p></div>
+  const group = (duplicate=false) => <div aria-hidden={duplicate || undefined} className="flex shrink-0 gap-5 pr-5">{CUSTOMER_REVIEWS.map((review,index)=><article key={`${review.name}-${index}`} dir="rtl" className="flex w-[280px] shrink-0 flex-col justify-between rounded-[28px] border border-[#f0d4dc] bg-white p-6 shadow-[0_16px_40px_rgba(212,86,122,0.06)] md:w-[320px]">
+    <div>
+      <div className="mb-4 flex items-center justify-between"><Stars n={review.stars}/><span className="text-[20px]">💗</span></div>
+      <p className="text-[15px] leading-8 text-[#3d2b30]">{review.text}</p>
+    </div>
+    <div className="mt-6 flex items-center gap-3 border-t border-[#f7e3e9] pt-4">
+      <div className="grid h-10 w-10 place-items-center rounded-full bg-[#fff0f3] text-[15px] font-semibold text-[#d4567a]">{review.name.charAt(0)}</div>
+      <div><p className="text-[13px] font-semibold text-[#181818]">{review.name}</p><p className="text-[11px] text-[#8c6b74]">{review.city}</p></div>
+      <span className="mr-auto rounded-full bg-[#e9f9ee] px-2.5 py-1 text-[9px] font-semibold text-[#1a9e4b]">{isAr?'موثّق ✓':'Verified ✓'}</span>
+    </div>
   </article>)}</div>
-  return <section className="overflow-hidden border-t border-[#dedbd5] bg-[#f4f2ee] py-20 md:py-28">
-    <div className="mb-10 text-center md:mb-14"><div className="container-basic"><h2 className="font-display text-[40px] font-medium leading-[1.12] text-[#181818] md:text-[58px]">{isAr?'لمسة بعيون عملائنا':'Lamssa through your eyes'}</h2><p className="mx-auto mt-4 max-w-xl text-[14px] leading-7 text-[#5f5b57] md:text-[15px]">{isAr?'لحظات حقيقية من تقييمات عملاء لمسة.':'Real moments from Lamssa customer reviews.'}</p></div></div>
-    <div ref={marqueeRef} className="customer-marquee-mask" tabIndex="0" aria-label={isAr?'اسحبي لاستعراض تجارب العميلات':'Drag or swipe to browse customer reviews'}><div ref={trackRef} className="customer-marquee-track flex w-max">{group()}{group(true)}</div></div>
+  return <section className="overflow-hidden border-t border-[#f0d4dc] bg-[#fff7f9] py-20 md:py-28">
+    <div className="mb-10 text-center md:mb-14"><div className="container-basic"><h2 className="font-display text-[40px] font-medium leading-[1.12] text-[#181818] md:text-[58px]">{isAr?'وش يقولون عملائنا':'What our customers say'}</h2><p className="mx-auto mt-4 max-w-xl text-[14px] leading-7 text-[#5f5b57] md:text-[15px]">{isAr?'تقييمات حقيقية من عملاء لمسة في الإمارات والخليج 💗':'Real reviews from Lamssa customers across the UAE & Gulf 💗'}</p></div></div>
+    <div ref={marqueeRef} className="customer-marquee-mask" tabIndex="0" aria-label={isAr?'اسحب لاستعراض التقييمات':'Drag or swipe to browse customer reviews'}><div ref={trackRef} className="customer-marquee-track flex w-max">{group()}{group(true)}</div></div>
   </section>
 }
 
@@ -595,37 +579,65 @@ function Checkout(){
   const { cart, subtotal, total, clearCart } = useCart()
   const { lang, isAr, t } = useLang()
   const { fmt } = useCurrency()
-  const [payment,setPayment]=useState('card')
+  const [payment,setPayment]=useState('cod')
   const [done,setDone]=useState(null)
+  const [form,setForm]=useState({ name:'', phone:'', country:isAr?'الإمارات العربية المتحدة':'United Arab Emirates', emirate:isAr?'دبي':'Dubai', address:'', area:'', notes:'' })
   const codFee = 0
   const grand = total + codFee
-  const field = 'h-[54px] w-full rounded-[16px] border border-[#dedbd5] bg-white/85 px-4 text-[13px] outline-none transition focus:border-[#1a1a1a] focus:ring-4 focus:ring-[#e8e6e1] placeholder:text-[#88847f]'
-  const label = 'mb-2 block text-[10px] font-semibold uppercase tracking-[.18em] text-[#706c67]'
-  const card = 'rounded-[28px] border border-[#dedbd5] bg-[#ffffff] p-5 md:p-7 shadow-[0_20px_55px_rgba(17,17,17,0.055)]'
+  const set = (k) => (e) => setForm(f => ({...f, [k]:e.target.value}))
+  const field = 'h-[54px] w-full rounded-[16px] border border-[#f0d4dc] bg-white/85 px-4 text-[13px] outline-none transition focus:border-[#d4567a] focus:ring-4 focus:ring-[#fbe4ea] placeholder:text-[#b89ba2]'
+  const label = 'mb-2 block text-[10px] font-semibold uppercase tracking-[.18em] text-[#8c6b74]'
+  const card = 'rounded-[28px] border border-[#f0d4dc] bg-[#ffffff] p-5 md:p-7 shadow-[0_20px_55px_rgba(212,86,122,0.06)]'
   const paymentMethods = isAr ? [
-    ['card','بطاقة ائتمان أو خصم','ادفعي بأمان ببطاقتك أو أبل باي',null],
-    ['tabby','تابي','ادفعي على ٤ دفعات بدون فوائد',null],
-    ['tamara','تمارا','قسّمي الدفع بسهولة',null],
-    ['cod','الدفع عند الاستلام','ادفعي عند وصول الطلب',null],
+    ['cod','الدفع عند الاستلام','ادفع نقداً عند وصول الطلب'],
+    ['whatsapp','الدفع عبر واتساب','نؤكد الطلب والتحويل عبر واتساب'],
   ] : [
-    ['card','Credit / Debit Card','Visa, Mastercard or Apple Pay',null],
-    ['tabby','Tabby','Pay in 4 interest-free installments',null],
-    ['tamara','Tamara','Split your payment easily',null],
-    ['cod','Cash on Delivery','Pay when your order arrives',null],
+    ['cod','Cash on Delivery','Pay in cash when your order arrives'],
+    ['whatsapp','Pay via WhatsApp','We confirm order and transfer on WhatsApp'],
   ]
   const countries = isAr ? ['الإمارات العربية المتحدة','السعودية','الكويت','قطر','البحرين','عُمان'] : ['United Arab Emirates','Saudi Arabia','Kuwait','Qatar','Bahrain','Oman']
   const emirates = isAr ? ['دبي','أبوظبي','الشارقة','عجمان','رأس الخيمة','الفجيرة','أم القيوين'] : ['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Fujairah','Umm Al Quwain']
-  function submit(e){ e.preventDefault(); setDone({ ref:`${isAr?'لمسة':'LAMSSA'}-${Date.now().toString().slice(-6)}`, total:grand, payment }); clearCart() }
-  if(done) return <main className="bg-[#ffffff] py-16 md:py-24"><div className="container-basic"><div className="max-w-2xl mx-auto rounded-[34px] border border-[#dedbd5] bg-white p-8 md:p-12 text-center shadow-[0_30px_90px_rgba(0,0,0,0.08)]"><div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full bg-[#efede9] text-[#55514d]"><CheckCircle2 size={34}/></div><p className="mb-3 text-[11px] uppercase tracking-[.24em] text-[#55514d]">{isAr?'تم تأكيد الطلب':'Order confirmed'}</p><h1 className="section-title mb-5">{isAr?'شكراً لكِ':'Thank you'}</h1><p className="text-lg mb-2">{isAr?'رقم الطلب':'Reference'}: <b>{done.ref}</b></p><p className="mb-7 text-[#6f6b66]">{isAr?'الإجمالي المؤكد':'Total confirmed'}: <b className="text-[#181818]">{fmt(done.total)}</b></p><div className="rounded-[22px] bg-[#efede9] p-5 text-sm leading-7 text-[#5f5b57]">{isAr?'تم استلام تفاصيل طلبك. ستتواصل لمسة عبر واتساب للتأكيد.':'Your order details were received. Lamssa will contact you on WhatsApp to confirm.'}</div><Link to="/" className="btn btn-black mt-8">{t('continueShopping')}</Link></div></div></main>
-  if(cart.length===0) return <main className="bg-[#ffffff] py-20 md:py-28"><div className="container-basic text-center"><div className="mx-auto max-w-lg rounded-[30px] border border-[#dedbd5] bg-white p-10 shadow-[0_25px_70px_rgba(0,0,0,0.06)]"><ShoppingBag size={48} className="mx-auto mb-5"/><h1 className="section-title mb-5">{isAr?'السلة فارغة':'Your cart is empty'}</h1><p className="mb-7 text-sm text-[#706c67]">{isAr?'أضيفي قطعة لبدء الدفع الآمن داخل الإمارات.':'Add a piece to start your secure UAE checkout.'}</p><Link to="/" className="btn btn-black">{t('shopNow')}</Link></div></div></main>
+  function buildWhatsAppMessage(ref){
+    const lines = []
+    lines.push(isAr?'🛍️ طلب جديد من لمسة':'🛍️ New Lamssa order')
+    lines.push(`${isAr?'رقم الطلب':'Ref'}: ${ref}`)
+    lines.push('')
+    lines.push(isAr?'📦 المنتجات:':'📦 Products:')
+    cart.forEach(item => {
+      lines.push(`• ${productName(item, lang)} × ${item.qty} — ${fmt(item.priceAed * item.qty)}`)
+    })
+    lines.push('')
+    lines.push(`${isAr?'الإجمالي':'Total'}: ${fmt(grand)}`)
+    lines.push(`${isAr?'الدفع':'Payment'}: ${payment==='cod'?(isAr?'الدفع عند الاستلام':'Cash on Delivery'):(isAr?'واتساب':'WhatsApp')}`)
+    lines.push('')
+    lines.push(isAr?'👤 بيانات التوصيل:':'👤 Delivery details:')
+    lines.push(`${isAr?'الاسم':'Name'}: ${form.name}`)
+    lines.push(`${isAr?'الهاتف':'Phone'}: ${form.phone}`)
+    lines.push(`${isAr?'الدولة':'Country'}: ${form.country}`)
+    lines.push(`${isAr?'الإمارة/المدينة':'Emirate/City'}: ${form.emirate}`)
+    lines.push(`${isAr?'العنوان':'Address'}: ${form.address}`)
+    if(form.area) lines.push(`${isAr?'المنطقة/معلم':'Area/Landmark'}: ${form.area}`)
+    if(form.notes) lines.push(`${isAr?'ملاحظات':'Notes'}: ${form.notes}`)
+    return encodeURIComponent(lines.join('\n'))
+  }
+  function submit(e){
+    e.preventDefault()
+    const ref = `LAMSSA-${Date.now().toString().slice(-6)}`
+    const msg = buildWhatsAppMessage(ref)
+    const waNumber = '971567277289'
+    window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank')
+    setDone({ ref, total:grand, payment })
+    clearCart()
+  }
+  if(done) return <main className="bg-[#ffffff] py-16 md:py-24"><div className="container-basic"><div className="max-w-2xl mx-auto rounded-[34px] border border-[#f0d4dc] bg-white p-8 md:p-12 text-center shadow-[0_30px_90px_rgba(212,86,122,0.1)]"><div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full bg-[#25D366] text-white"><WhatsAppIcon className="h-8 w-8"/></div><p className="mb-3 text-[11px] uppercase tracking-[.24em] text-[#8c6b74]">{isAr?'تم إرسال الطلب':'Order sent'}</p><h1 className="section-title mb-5">{isAr?'شكراً لك':'Thank you'}</h1><p className="text-lg mb-2">{isAr?'رقم الطلب':'Reference'}: <b>{done.ref}</b></p><p className="mb-7 text-[#6f6b66]">{isAr?'الإجمالي':'Total'}: <b className="text-[#181818]">{fmt(done.total)}</b></p><div className="rounded-[22px] bg-[#fff0f3] p-5 text-sm leading-7 text-[#6b545a]">{isAr?'تم فتح واتساب بتفاصيل طلبك. أرسل الرسالة لنا لتأكيد الطلب والتوصيل. إذا لم يفتح واتساب تلقائياً، تواصل معنا مباشرة.':'WhatsApp opened with your order details. Send us the message to confirm your order and delivery. If WhatsApp did not open automatically, contact us directly.'}</div><a href={`https://wa.me/971567277289`} target="_blank" rel="noreferrer" className="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 text-[13px] font-semibold uppercase tracking-[.14em] text-white"><WhatsAppIcon className="h-5 w-5"/> {isAr?'فتح واتساب':'Open WhatsApp'}</a><div className="mt-4"><Link to="/" className="btn btn-black">{t('continueShopping')}</Link></div></div></div></main>
+  if(cart.length===0) return <main className="bg-[#ffffff] py-20 md:py-28"><div className="container-basic text-center"><div className="mx-auto max-w-lg rounded-[30px] border border-[#f0d4dc] bg-white p-10 shadow-[0_25px_70px_rgba(212,86,122,0.08)]"><ShoppingBag size={48} className="mx-auto mb-5"/><h1 className="section-title mb-5">{isAr?'السلة فارغة':'Your cart is empty'}</h1><p className="mb-7 text-sm text-[#706c67]">{isAr?'أضف منتجاً لبدء الطلب.':'Add a product to start your order.'}</p><Link to="/" className="btn btn-black">{t('shopNow')}</Link></div></div></main>
   return <main className="bg-[#ffffff] py-10 md:py-16"><div className="container-basic">
-    <div className="mb-8 md:mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><p className="mb-3 text-[11px] uppercase tracking-[.26em] text-[#55514d]">{isAr?'دفع آمن داخل الإمارات':'Secure UAE checkout'}</p><h1 className="text-[30px] md:text-[44px] font-medium uppercase tracking-[.08em]">{t('checkout')}</h1><p className="mt-3 max-w-xl text-sm leading-7 text-[#706c67]">{isAr?'أسعار بالدرهم وخيارات تابي وتمارا والبطاقة والدفع عند الاستلام.':'AED pricing with Tabby, Tamara, card and COD options.'}</p></div><div className="grid grid-cols-3 gap-2 rounded-full border border-[#dedbd5] bg-white/70 p-1 text-[10px] uppercase tracking-[.14em] text-[#706c67]"><span className="rounded-full bg-[#d4567a] px-4 py-3 text-center text-white">{isAr?'البيانات':'Details'}</span><span className="px-4 py-3 text-center">{isAr?'الدفع':'Payment'}</span><span className="px-4 py-3 text-center">{isAr?'تأكيد':'Confirm'}</span></div></div>
+    <div className="mb-8 md:mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><p className="mb-3 text-[11px] uppercase tracking-[.26em] text-[#8c6b74]">{isAr?'إتمام الطلب عبر واتساب':'Checkout via WhatsApp'}</p><h1 className="text-[30px] md:text-[44px] font-medium uppercase tracking-[.08em]">{t('checkout')}</h1><p className="mt-3 max-w-xl text-sm leading-7 text-[#706c67]">{isAr?'املأ بياناتك وسنكمل الطلب عبر واتساب. الدفع عند الاستلام متاح داخل الإمارات.':'Fill in your details and we complete the order on WhatsApp. Cash on delivery available in the UAE.'}</p></div></div>
     <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-start"><div className="space-y-6">
-      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠١':'01'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'التواصل':'Contact'}</h2></div><span className="rounded-full bg-[#efede9] px-4 py-2 text-[11px] text-[#66635f]">{isAr?'تحديثات الطلب':'Order updates'}</span></div><div><label className={label}>{isAr?'البريد الإلكتروني':'Email address'}</label><input required type="email" placeholder={isAr?'البريد الإلكتروني':'name@email.com'} className={field}/></div><label className="mt-4 flex items-center gap-3 text-sm text-[#706c67]"><input type="checkbox" defaultChecked className="accent-[#111111]"/> {isAr?'أرسلي لي العروض وتحديثات الطلب عبر البريد':'Send me offers and order updates by email'}</label></section>
-      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠٢':'02'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'بيانات التوصيل':'Delivery details'}</h2></div><Truck size={24} className="text-[#55514d]"/></div><div className="grid gap-4 md:grid-cols-2"><div><label className={label}>{isAr?'الاسم الأول':'First name'}</label><input required placeholder={isAr?'الاسم الأول':'First name'} className={field}/></div><div><label className={label}>{isAr?'اسم العائلة':'Last name'}</label><input required placeholder={isAr?'اسم العائلة':'Last name'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'رقم الهاتف':'Phone number'}</label><input required placeholder={isAr?'+٩٧١ ٥٠ ١٢٣ ٤٥٦٧':'+971 XX XXX XXXX'} className={field}/></div><div><label className={label}>{isAr?'الدولة':'Country'}</label><select className={field}>{countries.map(x=><option key={x}>{x}</option>)}</select></div><div><label className={label}>{isAr?'الإمارة':'Emirate'}</label><select className={field}>{emirates.map(x=><option key={x}>{x}</option>)}</select></div><div className="md:col-span-2"><label className={label}>{isAr?'العنوان الكامل':'Full address'}</label><input required placeholder={isAr?'فيلا / شقة / شارع':'Villa / Apartment / Street'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'المنطقة أو أقرب معلم':'Area or landmark'}</label><input placeholder={isAr?'المنطقة، المبنى، أقرب معلم':'Area, building, nearest landmark'} className={field}/></div></div><div className="mt-5 rounded-[22px] border border-[#e6e3de] bg-[#efede9] p-4 text-sm leading-7 text-[#5f5b57]">{isAr?'يتم تأكيد تفاصيل التوصيل عبر واتساب بعد الطلب.':'Delivery details are confirmed by WhatsApp after ordering.'}</div></section>
-      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#55514d]">{isAr?'٠٣':'03'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'الدفع':'Payment'}</h2></div><CreditCard size={24} className="text-[#55514d]"/></div><div className="grid gap-2.5 md:grid-cols-2">{paymentMethods.map(([id,title,desc,fee])=>{ const selected=payment===id; return <button type="button" aria-pressed={selected} onClick={()=>setPayment(id)} key={id} className={`min-h-[86px] rounded-[18px] border p-3.5 text-left transition ${selected?'border-[#1a1a1a] bg-[#d4567a] text-white shadow-[0_10px_28px_rgba(0,0,0,0.14)]':'border-[#dedbd5] bg-white hover:border-[#88847f]'}`}><div className="flex items-center gap-3"><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><b className="text-[13px] leading-5">{title}</b>{fee&&<span className={`rounded-full px-2 py-0.5 text-[9px] ${selected?'bg-white/15 text-white':'bg-[#efede9] text-[#66635f]'}`}>{fee}</span>}</div><p className={`mt-1 text-[11px] leading-5 ${selected?'text-white/70':'text-[#706c67]'}`}>{desc}</p></div><PaymentMethodMark id={id} isAr={isAr}/><span className={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full border ${selected?'border-white bg-white':'border-[#aaa6a0] bg-[#f8faf8]'}`}>{selected&&<span className="h-1.5 w-1.5 rounded-full bg-[#1a1a1a]"/>}</span></div></button>})}</div>{payment==='card' && <div className="mt-5 grid gap-4 md:grid-cols-2"><div className="md:col-span-2"><label className={label}>{isAr?'رقم البطاقة':'Card number'}</label><input required placeholder={isAr?'١٢٣٤ ١٢٣٤ ١٢٣٤ ١٢٣٤':'1234 1234 1234 1234'} className={field}/></div><div><label className={label}>{isAr?'تاريخ الانتهاء':'Expiry'}</label><input required placeholder={isAr?'شهر / سنة':'MM / YY'} className={field}/></div><div><label className={label}>{isAr?'رمز الأمان':'CVV'}</label><input required placeholder={isAr?'رمز الأمان':'CVV'} className={field}/></div></div>}</section>
+      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#8c6b74]">{isAr?'٠١':'01'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'بيانات التوصيل':'Delivery details'}</h2></div><Truck size={24} className="text-[#d4567a]"/></div><div className="grid gap-4 md:grid-cols-2"><div className="md:col-span-2"><label className={label}>{isAr?'الاسم الكامل':'Full name'}</label><input required value={form.name} onChange={set('name')} placeholder={isAr?'الاسم الكامل':'Full name'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'رقم الهاتف / واتساب':'Phone / WhatsApp number'}</label><input required value={form.phone} onChange={set('phone')} placeholder={isAr?'+٩٧١ ٥٠ ١٢٣ ٤٥٦٧':'+971 XX XXX XXXX'} className={field}/></div><div><label className={label}>{isAr?'الدولة':'Country'}</label><select value={form.country} onChange={set('country')} className={field}>{countries.map(x=><option key={x}>{x}</option>)}</select></div><div><label className={label}>{isAr?'الإمارة / المدينة':'Emirate / City'}</label><select value={form.emirate} onChange={set('emirate')} className={field}>{emirates.map(x=><option key={x}>{x}</option>)}</select></div><div className="md:col-span-2"><label className={label}>{isAr?'العنوان الكامل':'Full address'}</label><input required value={form.address} onChange={set('address')} placeholder={isAr?'فيلا / شقة / شارع':'Villa / Apartment / Street'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'المنطقة أو أقرب معلم':'Area or landmark'}</label><input value={form.area} onChange={set('area')} placeholder={isAr?'المنطقة، المبنى، أقرب معلم':'Area, building, nearest landmark'} className={field}/></div><div className="md:col-span-2"><label className={label}>{isAr?'ملاحظات (اختياري)':'Notes (optional)'}</label><input value={form.notes} onChange={set('notes')} placeholder={isAr?'أي ملاحظات على الطلب':'Any notes for your order'} className={field}/></div></div></section>
+      <section className={card}><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-[11px] uppercase tracking-[.22em] text-[#8c6b74]">{isAr?'٠٢':'02'}</p><h2 className="text-lg font-semibold uppercase tracking-[.14em]">{isAr?'طريقة الدفع':'Payment method'}</h2></div><Banknote size={24} className="text-[#d4567a]"/></div><div className="grid gap-2.5 md:grid-cols-2">{paymentMethods.map(([id,title,desc])=>{ const selected=payment===id; return <button type="button" aria-pressed={selected} onClick={()=>setPayment(id)} key={id} className={`min-h-[80px] rounded-[18px] border p-3.5 text-left transition ${selected?'border-[#d4567a] bg-[#d4567a] text-white shadow-[0_10px_28px_rgba(212,86,122,0.22)]':'border-[#f0d4dc] bg-white hover:border-[#d4567a]'}`}><div className="flex items-center gap-3"><div className="min-w-0 flex-1"><b className="text-[13px] leading-5">{title}</b><p className={`mt-1 text-[11px] leading-5 ${selected?'text-white/80':'text-[#706c67]'}`}>{desc}</p></div><span className={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full border ${selected?'border-white bg-white':'border-[#d4a9b5] bg-white'}`}>{selected&&<span className="h-1.5 w-1.5 rounded-full bg-[#d4567a]"/>}</span></div></button>})}</div></section>
     </div>
-    <aside className="rounded-[32px] border border-[#dedbd5] bg-white p-5 md:p-6 shadow-[0_28px_80px_rgba(17,17,17,0.075)] lg:sticky lg:top-6"><div className="mb-5 flex items-center justify-between"><h2 className="text-sm font-semibold uppercase tracking-[.18em]">{isAr?'ملخص الطلب':'Order summary'}</h2><span className="rounded-full bg-[#efede9] px-3 py-1 text-[11px] text-[#66635f]">{cart.length} {isAr?'قطعة':`item${cart.length>1?'s':''}`}</span></div><div className="max-h-[360px] space-y-4 overflow-auto pr-1">{cart.map(item=><div key={item.key} className="grid grid-cols-[82px_1fr] gap-4 rounded-[22px] border border-[#e8e6e1] bg-[#ffffff] p-3"><img src={item.image} className="h-[123px] w-[82px] rounded-[16px] bg-[#f7f7f7] object-cover"/><div className="min-w-0"><p className="text-[12px] font-medium uppercase leading-5 tracking-[.05em]">{productName(item, lang)}</p><p className="mt-2 text-[11px] leading-5 text-[#706c67]">{isAr?'الكمية':'Qty'} {item.qty} · {isAr?'اللون':'Color'} {productColorName(item.color || item.colorName, isAr)}</p><p className="mt-3 font-semibold">{fmt(item.priceAed * item.qty)}</p></div></div>)}</div><div className="my-5 rounded-[22px] bg-[#efede9] p-4 text-xs leading-6 text-[#6f6b66]"><div className="flex items-center gap-2 font-semibold text-[#181818]"><BadgeCheck size={16}/> {isAr?'دفع محمي':'Protected checkout'}</div><p className="mt-1">{isAr?'أسعار بالدرهم وتأكيد عبر واتساب.':'AED pricing and WhatsApp confirmation.'}</p></div><div className="space-y-3 border-t border-[#e2dfda] pt-5 text-sm"><div className="flex justify-between"><span>{isAr?'المجموع الفرعي':'Subtotal'}</span><span>{fmt(subtotal)}</span></div><div className="flex justify-between"><span>{isAr?'الشحن':'Shipping'}</span><span>{isAr?'يتم التأكيد':'Confirmed separately'}</span></div>{codFee>0 && <div className="flex justify-between"><span>{isAr?'رسوم الدفع عند الاستلام':'COD fee'}</span><span>{fmt(codFee)}</span></div>}<div className="flex justify-between border-t border-[#e2dfda] pt-4 text-lg font-semibold"><span>{isAr?'الإجمالي':'Total'}</span><span>{fmt(grand)}</span></div></div><button className="btn btn-black w-full mt-6">{isAr?'تأكيد الطلب':'Place order'} · {fmt(grand)}</button><p className="mt-4 text-center text-[11px] leading-5 text-[#67776e]">{isAr?'بإتمام الطلب، توافقين على التواصل عبر واتساب لتأكيد التوصيل.':'By placing your order you agree to be contacted on WhatsApp for delivery confirmation.'}</p></aside>
+    <aside className="rounded-[32px] border border-[#f0d4dc] bg-white p-5 md:p-6 shadow-[0_28px_80px_rgba(212,86,122,0.08)] lg:sticky lg:top-6"><div className="mb-5 flex items-center justify-between"><h2 className="text-sm font-semibold uppercase tracking-[.18em]">{isAr?'ملخص الطلب':'Order summary'}</h2><span className="rounded-full bg-[#fff0f3] px-3 py-1 text-[11px] text-[#b8435f]">{cart.length} {isAr?'منتج':`item${cart.length>1?'s':''}`}</span></div><div className="max-h-[360px] space-y-4 overflow-auto pr-1">{cart.map(item=><div key={item.key} className="grid grid-cols-[82px_1fr] gap-4 rounded-[22px] border border-[#f0d4dc] bg-[#ffffff] p-3"><img src={item.image} className="h-[82px] w-[82px] rounded-[16px] bg-white object-contain border border-[#f7f7f7]"/><div className="min-w-0"><p className="text-[12px] font-medium uppercase leading-5 tracking-[.05em]">{productName(item, lang)}</p><p className="mt-2 text-[11px] leading-5 text-[#706c67]">{isAr?'الكمية':'Qty'} {item.qty}</p><p className="mt-3 font-semibold">{fmt(item.priceAed * item.qty)}</p></div></div>)}</div><div className="my-5 rounded-[22px] bg-[#fff0f3] p-4 text-xs leading-6 text-[#6b545a]"><div className="flex items-center gap-2 font-semibold text-[#b8435f]"><BadgeCheck size={16}/> {isAr?'طلب آمن':'Secure order'}</div><p className="mt-1">{isAr?'نؤكد التوصيل عبر واتساب.':'We confirm delivery on WhatsApp.'}</p></div><div className="space-y-3 border-t border-[#f0d4dc] pt-5 text-sm"><div className="flex justify-between"><span>{isAr?'المجموع الفرعي':'Subtotal'}</span><span>{fmt(subtotal)}</span></div><div className="flex justify-between"><span>{isAr?'الشحن':'Shipping'}</span><span className="text-[#d4567a] font-semibold">{isAr?'مجاني':'Free'}</span></div><div className="flex justify-between border-t border-[#f0d4dc] pt-4 text-lg font-semibold"><span>{isAr?'الإجمالي':'Total'}</span><span>{fmt(grand)}</span></div></div><button type="submit" className="mt-6 flex h-[54px] w-full items-center justify-center gap-2 rounded-full bg-[#25D366] text-[13px] font-semibold uppercase tracking-[.14em] text-white transition hover:brightness-105"><WhatsAppIcon className="h-5 w-5"/> {isAr?'إتمام الطلب عبر واتساب':'Complete order on WhatsApp'}</button><p className="mt-3 text-center text-[11px] leading-5 text-[#8c6b74]">{isAr?'سيتم فتح واتساب بتفاصيل طلبك.':'WhatsApp will open with your order details.'}</p></aside>
     </form></div></main>
 }
 function FloatingWhatsApp(){
