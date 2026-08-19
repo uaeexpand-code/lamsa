@@ -9,10 +9,8 @@ export const assets = {
 }
 
 export const collections = [
-  ['NEW ARRIVALS','/images/lamssa/products/edible-bikini/strawberry.png'],
-  ['EDIBLE FLAVORS','/images/lamssa/products/edible-bikini/mango.png'],
-  ['NOVELTY LINGERIE','/images/lamssa/products/edible-bikini/grape.png'],
-  ['BODY CARE','/images/lamssa/products/edible-bikini/pineapple.png'],
+  ['EDIBLE BIKINI','/images/lamssa/products/edible-bikini/strawberry.png'],
+  ['BODY CARE','/images/lamssa/products/bikini-care/01.png'],
 ]
 
 export const FLAVORS = [

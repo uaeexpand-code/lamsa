@@ -66,8 +66,8 @@ const copy = {
 }
 const arCollections = {
   'NEW ARRIVALS':'وصل حديثاً',
-  'EDIBLE FLAVORS':'نكهات قابلة للأكل', 'NOVELTY LINGERIE':'لانجري مميز', 'BODY CARE':'العناية بالجسم',
-  'Edible Flavors':'نكهات قابلة للأكل', 'Novelty Lingerie':'لانجري مميز', 'Body Care':'العناية بالجسم', 'Related Products':'منتجات مشابهة',
+  'EDIBLE BIKINI':'بكيني قابل للأكل', 'BODY CARE':'العناية بالجسم',
+  'Edible Bikini':'بكيني قابل للأكل', 'Body Care':'العناية بالجسم', 'Related Products':'منتجات مشابهة', 'Our products':'منتجاتنا',
   'LAMSSA New Arrivals':'وصل حديثاً من لمسة', 'Lamssa new arrivals':'وصل حديثاً من لمسة'
 }
 const productName = (p, lang='en') => lang === 'ar' ? (p.arName || 'منتج لمسة') : p.name
@@ -146,7 +146,7 @@ function Header(){
     <div className="w-full max-w-full overflow-hidden h-[30px] bg-[#fff0f3] flex items-center justify-center text-center text-[9px] md:text-[11px] tracking-[.18em] uppercase px-3 text-[#b8435f] border-b border-[#f0d4dc]">{t('promo')}</div>
     <header className="w-full max-w-full overflow-hidden h-[76px] md:h-[104px] border-b border-[#dedbd5] bg-[#ffffff]/95 relative z-10 shadow-[0_12px_35px_rgba(17,17,17,0.045)]">
       <div className="container-basic h-full grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-8 min-w-0">
-        <nav className="desktop-nav flex items-center gap-8 text-[11px] tracking-[.16em] uppercase text-[#202020]"><Link className="nav-luxe" to="/">{t('shop')}</Link><Link className="nav-luxe" to="/collection/new-arrivals">{t('new')}</Link><Link className="nav-luxe" to="/#collections">{t('collections')}</Link><Link className="nav-luxe" to="/collection/edible-flavors">{isAr?'نكهات':'Flavors'}</Link></nav>
+        <nav className="desktop-nav flex items-center gap-8 text-[11px] tracking-[.16em] uppercase text-[#202020]"><Link className="nav-luxe" to="/">{t('shop')}</Link><Link className="nav-luxe" to="/collection/new-arrivals">{t('new')}</Link><Link className="nav-luxe" to="/#collections">{t('collections')}</Link><Link className="nav-luxe" to="/collection/edible-bikini">{isAr?'بكيني':'Bikini'}</Link></nav>
         <Link to="/" className="justify-self-start md:justify-self-center shrink-0 px-2" aria-label={isAr?'الصفحة الرئيسية للمسة':'Lamssa home'}><BrandLogo /></Link>
         <div className="flex items-center justify-end gap-1.5 md:gap-2.5 text-[11px] shrink-0 min-w-0">
           <Link to="/" className="desktop-nav mr-2 uppercase tracking-[.16em] text-[#202020] nav-luxe">{t('contact')}</Link>
@@ -268,11 +268,10 @@ function ProductCard({p, i=0}){
 function ProductGrid({title, list=products, actionPath}){ const { t, lang } = useLang(); return <section className="border-t border-[#f0d4dc] py-20"><div className="container-basic"><h2 className="section-title mb-14">{collectionText(title, lang)}</h2><div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 md:gap-x-8">{list.map((p,i)=><ProductCard p={p} key={p.id} i={i}/>)}</div>{actionPath && <div className="text-center mt-14"><Link to={actionPath} className="btn btn-black">{t('viewAll')}</Link></div>}</div></section> }
 const collectionPages = {
   'new-arrivals': { title:'LAMSSA New Arrivals', eyebrow:'Latest products', desc:'Explore the complete Lamssa product selection.', arEyebrow:'وصل حديثاً', arDesc:'اكتشف تشكيلة لمسة الحالية.', list:products },
-  'edible-flavors': { title:'Edible Flavors', eyebrow:'Edible flavors', desc:'Sweet edible products in six delicious flavors, for married couples.', arEyebrow:'نكهات قابلة للأكل', arDesc:'منتجات قابلة للأكل بست نكهات لذيذة، للمتزوجين.', list:products },
-  'novelty-lingerie': { title:'Novelty Lingerie', eyebrow:'Novelty sets', desc:'Playful edible candy bikinis for special evenings.', arEyebrow:'لانجري مميز', arDesc:'بكيني حلوى مرح لأمسيات مميزة.', list:products },
-  'body-care': { title:'Body Care', eyebrow:'Intimate care', desc:'Premium products for sensitive areas.', arEyebrow:'العناية بالجسم', arDesc:'منتجات فاخرة للمناطق الحساسة.', list:products },
+  'edible-bikini': { title:'Edible Bikini', eyebrow:'Edible flavors', desc:'Sweet edible candy bikinis in six delicious flavors, for married couples.', arEyebrow:'بكيني قابل للأكل', arDesc:'بكيني حلوى قابل للأكل بست نكهات لذيذة، للمتزوجين.', list:products.filter(p => p.id.startsWith('edible-bikini')) },
+  'body-care': { title:'Body Care', eyebrow:'Intimate care', desc:'Premium care products for sensitive areas.', arEyebrow:'العناية بالجسم', arDesc:'منتجات عناية فاخرة للمناطق الحساسة.', list:products.filter(p => p.id.includes('care')) },
 }
-const collectionSlug = (name) => name.includes('NEW') ? 'new-arrivals' : name.toLowerCase().replaceAll(' ','-')
+const collectionSlug = (name) => name.toLowerCase().replaceAll(' ','-')
 function Home(){
   const { t, lang, isAr } = useLang()
   const { fmt } = useCurrency()
@@ -306,7 +305,7 @@ function Home(){
           <h2 className="font-display text-[42px] font-medium leading-none md:text-[58px]">{isAr?'تسوق حسب الفئة':'Shop by category'}</h2>
           <p className="mt-5 max-w-lg text-sm leading-7 text-[#6f6b66]">{isAr?'منتجات مميزة للمتزوجين بتوصيل سريع للإمارات والخليج.':'Premium products for married couples with fast UAE & Gulf delivery.'}</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className={`${index===0?'md:col-span-6':'md:col-span-2'} group relative min-h-[280px] overflow-hidden rounded-[20px] bg-[#fdf7f8] md:min-h-[440px]`}><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-contain p-6 transition duration-700 group-hover:scale-[1.05]"/><div className="absolute inset-0 bg-gradient-to-t from-[#d4567a]/70 via-transparent to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className={`${index===0?'text-2xl md:text-4xl':'text-base md:text-xl'} font-display leading-tight`}>{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/85">{t('openCollection')}</p></div></Link>)}</div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">{collections.map(([name,src],index)=><Link key={name} to={`/collection/${collectionSlug(name)}`} className="group relative min-h-[320px] overflow-hidden rounded-[20px] bg-[#fdf7f8] md:min-h-[460px]"><img src={src} alt={collectionText(name, lang)} className="absolute inset-0 h-full w-full object-contain p-6 transition duration-700 group-hover:scale-[1.05]"/><div className="absolute inset-0 bg-gradient-to-t from-[#d4567a]/70 via-transparent to-transparent"/><div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-7"><h3 className="text-2xl md:text-3xl font-display leading-tight">{collectionText(name, lang)}</h3><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.2em] text-white/85">{t('openCollection')}</p></div></Link>)}</div>
       </div>
     </section>
 
