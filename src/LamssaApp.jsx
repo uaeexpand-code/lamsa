@@ -570,7 +570,7 @@ function ProductPage(){
             <div className="space-y-6">
               {product.flavor && <div>
                 <span className={optionLabel}>{isAr?'النكهة':'Flavor'}: <b className="text-[#181818]">{isAr ? product.flavor.arName : product.flavor.name}</b></span>
-                <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>navigate(`/product/edible-bikini-${flavor.id}`)} aria-label={isAr?flavor.arName:flavor.name} title={isAr?flavor.arName:flavor.name} className={`grid h-12 w-12 place-items-center rounded-full border-2 bg-white text-[22px] leading-none transition ${product.flavor.id===flavor.id?'border-[#d4567a] ring-2 ring-[#d4567a] ring-offset-2 scale-105':'border-[#f0d4dc] hover:border-[#d4567a] hover:scale-105'}`}>{flavor.emoji}</button>)}</div>
+                <div className="flex flex-wrap gap-2.5">{FLAVORS.map(flavor=><button key={flavor.id} type="button" onClick={()=>navigate(`/product/edible-bikini-${flavor.id}`)} aria-label={isAr?flavor.arName:flavor.name} title={isAr?flavor.arName:flavor.name} className={`grid h-12 w-12 place-items-center rounded-full border-2 bg-white transition ${product.flavor.id===flavor.id?'border-[#d4567a] ring-2 ring-[#d4567a] ring-offset-2 scale-105':'border-[#f0d4dc] hover:border-[#d4567a] hover:scale-105'}`}><img src={flavor.icon} alt="" className="h-6 w-6"/></button>)}</div>
               </div>}
               <p className="text-sm leading-7 text-[#5f5b57]">{productDesc(product, lang)}</p>
             </div>
